@@ -40,9 +40,9 @@ Usage
 
 .. code-block:: python
 
-  import pylint
+  import pytile
 
-  client = pylint.Client('email@address.com', 'password12345')
+  client = pytile.Client('email@address.com', 'password12345')
   client.get_tiles()
 
   # => {"version":1,"revision":1,"timestamp":"2017-11-03T20:21:48.855Z","timestamp_ms":1509740508855,"result_code":0,"result":{"12988abcd712":{"tileState":{"uuid":"1298add778","connectionStateCode": ....
