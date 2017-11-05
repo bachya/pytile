@@ -16,7 +16,7 @@ pytile: A Simple Python Library for Tile® Bluetooth trackers
 .. image:: https://codecov.io/gh/bachya/pytile/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/bachya/pytile
 
-.. image:: https://img.shields.io/codeclimate/github/bachya/pytile.svg
+.. image:: https://api.codeclimate.com/v1/badges/71eb642c735e33adcdfc/maintainability
   :target: https://codeclimate.com/github/bachya/pytile
 
 .. image:: https://img.shields.io/badge/SayThanks-!-1EAEDB.svg
