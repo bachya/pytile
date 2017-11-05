@@ -6,5 +6,4 @@
 .tox
 __pycache__
 build
-coverage.xml
 dist
