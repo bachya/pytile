@@ -23,7 +23,7 @@ pytile: A Simple Python Library for Tile® Bluetooth trackers
   :target: https://saythanks.io/to/bachya
 
 pytile is a simple Python library for retrieving information on `Tile® Bluetooth
-trackers <https://www.thetileapp.com>` (including last location and more).
+trackers <https://www.thetileapp.com>`_ (including last location and more).
 
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
@@ -47,8 +47,8 @@ Usage
 
   # => {"version":1,"revision":1,"timestamp":"2017-11-03T20:21:48.855Z","timestamp_ms":1509740508855,"result_code":0,"result":{"12988abcd712":{"tileState":{"uuid":"1298add778","connectionStateCode": ....
 
-💧 Contributing
-===============
+Contributing
+============
 
 #. `Check for open features/bugs <https://github.com/bachya/pytile/issues>`_
    or `initiate a discussion on one <https://github.com/bachya/pytile/issues/new>`_.
