@@ -64,7 +64,7 @@ def test_client_with_uuid(client_response_200, session_response_200,
         assert client.user_uuid == user_uuid
 
 
-def test_get_tiles(tile_details_response_200, tile_list_response_200,
+def test_get_tiles(tile_active_response_200, tile_list_response_200,
                    client_response_200, session_response_200, user_uuid):
     """Test getting a list of tiles back."""
     with requests_mock.mock() as mock:
@@ -79,8 +79,10 @@ def test_get_tiles(tile_details_response_200, tile_list_response_200,
             text=json.dumps(tile_list_response_200))
         mock.get(
             '{0}/tiles'.format(TILE_API_BASE_URL),
-            text=json.dumps(tile_details_response_200))
+            text=json.dumps(tile_active_response_200))
 
         client = pytile.Client('email@address.com', 'password12345')
         assert client.user_uuid == user_uuid
-        assert client.get_tiles() == tile_details_response_200
+
+        tiles = client.get_tiles()
+        assert len(tiles) == len(tile_list_response_200['result'])

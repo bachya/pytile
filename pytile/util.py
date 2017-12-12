@@ -1,6 +1,12 @@
 """Define various utility functions."""
 
 import time
+import uuid
+
+
+def generate_uuid():
+    """Generate a Tile-compliant UUID."""
+    return str(uuid.uuid4())
 
 
 def merge_two_dicts(dict1, dict2):

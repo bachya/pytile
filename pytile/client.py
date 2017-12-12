@@ -1,7 +1,5 @@
 """Define an AirVisual client."""
 
-import uuid
-
 import requests
 
 import pytile.api as api
@@ -17,15 +15,22 @@ class Client(api.BaseAPI):
         self._password = password
         self._email = email
         self.locale = locale
+        self.session_expiry = None
 
         if not client_uuid:
-            client_uuid = str(uuid.uuid4())
+            client_uuid = util.generate_uuid()
         self.user_uuid = None
 
         super(Client, self).__init__(client_uuid, requests.Session())
 
         self.confirm_client()
         self.create_session()
+
+    @property
+    def session_expired(self):
+        """Define property that determines whether the session has expired."""
+        return (not self.session_expiry
+                or self.session_expiry <= util.current_epoch_time())
 
     def confirm_client(self):
         """Create a (or update an existing) Tile client."""
@@ -50,8 +55,11 @@ class Client(api.BaseAPI):
             self.user_uuid = resp['result']['user']['user_uuid']
         self.session_expiry = resp['result']['session_expiration_timestamp']
 
-    def get_tiles(self, type_whitelist=None):
+    def get_tiles(self, type_whitelist=None, show_inactive=False):
         """Get a list of all Tiles owned by the user."""
+        # Be nice and create a new session if the current one has expired:
+        if self.session_expired:
+            self.create_session()
 
         list_resp = self.get(
             'users/{0}/user_tiles'.format(self.user_uuid)).json()
@@ -60,4 +68,10 @@ class Client(api.BaseAPI):
             if not type_whitelist or tile['tileType'] in type_whitelist
         ]
 
-        return self.get('tiles', params={'tile_uuids': tile_uuid_list}).json()
+        tile_resp = self.get(
+            'tiles', params={'tile_uuids': tile_uuid_list}).json()
+        return [
+            tile for tile in tile_resp['result'].values()
+            if show_inactive
+            or tile['tileState']['connection_state'] == 'READY'
+        ]
