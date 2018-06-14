@@ -1,0 +1,6 @@
+[run]
+source = pytile
+
+omit =
+    pytile/__version__.py
+
