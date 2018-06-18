@@ -2,23 +2,24 @@
 
 url = "https://pypi.python.org/simple"
 verify_ssl = true
-name = "pypi"
-
-
-[packages]
-
-requests = "*"
 
 
 [dev-packages]
 
-Sphinx = "*"
+"flake8" = "*"
+aresponses = "*"
 codecov = "*"
 coverage = "*"
 detox = "*"
-flake8 = "*"
-pytest = "*"
+pydocstyle = "*"
+pytest-aiohttp = "*"
 pytest-cov = "*"
-requests-mock = "*"
+pytest-mock = "*"
+sphinx = "*"
 tox = "*"
 twine = "*"
+
+[packages]
+
+aiodns = "*"
+aiohttp = "*"
