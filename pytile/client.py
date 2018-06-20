@@ -1,77 +1,99 @@
-"""Define an AirVisual client."""
+"""Define a client to interact with Pollen.com."""
+from uuid import uuid4
 
-import requests
+from aiohttp import ClientSession, client_exceptions
 
-import pytile.api as api
-import pytile.const as const
-import pytile.util as util
+from .errors import RequestError, SessionExpiredError
+from .tile import Tile
+from .util import current_epoch_time
+
+API_URL_SCAFFOLD = 'https://production.tile-api.com/api/v1'
+DEFAULT_APP_ID = 'ios-tile-production'
+DEFAULT_APP_VERSION = '2.31.0'
+DEFAULT_LOCALE = 'en-US'
 
 
-class Client(api.BaseAPI):
-    """Define an AirVisual API client."""
+class Client(object):  # pylint: disable=too-many-instance-attributes
+    """Define the client."""
 
-    def __init__(self, email, password, client_uuid=None, locale='en-US'):
+    def __init__(
+            self,
+            email: str,
+            password: str,
+            websession: ClientSession,
+            *,
+            client_uuid: str = None,
+            locale: str = DEFAULT_LOCALE) -> None:
         """Initialize."""
-        self._password = password
+        self._client_established = False
         self._email = email
-        self.locale = locale
-        self.session_expiry = None
+        self._locale = locale
+        self._password = password
+        self._session_expiry = None
+        self._user_uuid = None
+        self._websession = websession
+        self.tiles = None
 
-        if not client_uuid:
-            client_uuid = util.generate_uuid()
-        self.user_uuid = None
+        self._client_uuid = client_uuid
+        if not self._client_uuid:
+            self._client_uuid = str(uuid4())
 
-        super(Client, self).__init__(client_uuid, requests.Session())
+    async def get_session(self) -> None:
+        """Create a Tile session."""
+        if not self._client_established:
+            await self.request(
+                'put',
+                'clients/{0}'.format(self._client_uuid),
+                data={
+                    'app_id': DEFAULT_APP_ID,
+                    'app_version': DEFAULT_APP_VERSION,
+                    'locale': self._locale
+                })
+            self._client_established = True
 
-        self.confirm_client()
-        self.create_session()
-
-    @property
-    def session_expired(self):
-        """Define property that determines whether the session has expired."""
-        return (not self.session_expiry
-                or self.session_expiry <= util.current_epoch_time())
-
-    def confirm_client(self):
-        """Create a (or update an existing) Tile client."""
-        self.put(
-            'clients/{0}'.format(self.client_uuid),
+        resp = await self.request(
+            'post',
+            'clients/{0}/sessions'.format(self._client_uuid),
             data={
-                'app_id': const.TILE_APP_ID,
-                'app_version': const.TILE_APP_VERSION,
-                'locale': self.locale,
-                'registration_timestamp': util.current_epoch_time(),
-                'user_device_name': 'pytile Client'
+                'email': self._email,
+                'password': self._password
             })
 
-    def create_session(self):
-        """Create a Tile session."""
-        resp = self.post(
-            'clients/{0}/sessions'.format(self.client_uuid),
-            data={'email': self._email,
-                  'password': self._password}).json()
+        if not self._user_uuid:
+            self._user_uuid = resp['result']['user']['user_uuid']
+        self._session_expiry = resp['result']['session_expiration_timestamp']
 
-        if not self.user_uuid:
-            self.user_uuid = resp['result']['user']['user_uuid']
-        self.session_expiry = resp['result']['session_expiration_timestamp']
+        self.tiles = Tile(self.request, self._user_uuid)  # type: ignore
 
-    def get_tiles(self, type_whitelist=None, show_inactive=False):
-        """Get a list of all Tiles owned by the user."""
-        # Be nice and create a new session if the current one has expired:
-        if self.session_expired:
-            self.create_session()
+    async def request(
+            self,
+            method: str,
+            endpoint: str,
+            *,
+            headers: dict = None,
+            params: dict = None,
+            data: dict = None) -> dict:
+        """Make a request against AirVisual."""
+        if (self._session_expiry
+                and self._session_expiry <= current_epoch_time()):
+            raise SessionExpiredError('Session has expired; make a new one!')
 
-        list_resp = self.get(
-            'users/{0}/user_tiles'.format(self.user_uuid)).json()
-        tile_uuid_list = [
-            tile['tile_uuid'] for tile in list_resp['result']
-            if not type_whitelist or tile['tileType'] in type_whitelist
-        ]
+        url = '{0}/{1}'.format(API_URL_SCAFFOLD, endpoint)
 
-        tile_resp = self.get(
-            'tiles', params={'tile_uuids': tile_uuid_list}).json()
-        return [
-            tile for tile in tile_resp['result'].values()
-            if show_inactive
-            or tile['tileState']['connection_state'] == 'READY'
-        ]
+        if not headers:
+            headers = {}
+        headers.update({
+            'Tile_app_id': DEFAULT_APP_ID,
+            'Tile_app_version': DEFAULT_APP_VERSION,
+            'Tile_client_uuid': self._client_uuid,
+        })
+
+        async with self._websession.request(method, url, headers=headers,
+                                            params=params, data=data) as resp:
+            try:
+                resp.raise_for_status()
+                return await resp.json(content_type=None)
+            except client_exceptions.ClientError as err:
+                raise RequestError(
+                    'Error requesting data from {0}: {1}'.format(
+                        endpoint, err)) from None

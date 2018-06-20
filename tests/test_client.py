@@ -1,88 +1,137 @@
-"""Define a set of base API tests."""
-
-# pylint: disable=wildcard-import,redefined-outer-name,unused-wildcard-import
-
+"""Define tests for the client object."""
+# pylint: disable=redefined-outer-name,unused-import
 import json
-import re
+from time import time
 
+import aiohttp
 import pytest
-import requests_mock
 
-import pytile
-from pytile.const import TILE_API_BASE_URL
-from tests.fixtures.client import *  # noqa
+from pytile import Client
+from pytile.errors import RequestError
 
-UUID_PATTERN = r'[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}'
-CLIENT_URL_PATTERN = '{0}/clients/{1}'.format(TILE_API_BASE_URL, UUID_PATTERN)
-SESSION_URL_PATTERN = '{0}/clients/{1}/sessions'.format(
-    TILE_API_BASE_URL, UUID_PATTERN)
+from .const import TILE_CLIENT_UUID, TILE_EMAIL, TILE_PASSWORD, TILE_USER_UUID
 
 
-def test_bad_credentials(client_response_200):
-    """Test what happens when a bad email/password is given."""
-    with requests_mock.Mocker() as mock:
-        mock.put(
-            re.compile(CLIENT_URL_PATTERN),
-            text=json.dumps(client_response_200))
-        mock.post(
-            re.compile(SESSION_URL_PATTERN),
-            status_code=401)
+@pytest.fixture(scope='session')
+def fixture_create_client():
+    """Return a /clients/<UUID> response."""
+    return {
+        "version": 1,
+        "revision": 1,
+        "timestamp": "2018-06-19T23:03:32.873Z",
+        "timestamp_ms": 1529449412873,
+        "result_code": 0,
+        "result": {
+            "locale": "en-US",
+            "client_uuid": TILE_CLIENT_UUID,
+            "app_id": "ios-tile-production",
+            "app_version": "2.31.0",
+            "os_name": None,
+            "os_release": None,
+            "model": None,
+            "signed_in_user_uuid": None,
+            "registration_timestamp": 1529449412870,
+            "user_device_name": None,
+            "beta_option": False,
+            "last_modified_timestamp": 1529449412870
+        }
+    }
 
-        with pytest.raises(pytile.exceptions.HTTPError) as exc_info:
-            pytile.Client('email@address.com', 'password12345')
-            assert '401' in str(exc_info)
+
+@pytest.fixture(scope='session')
+def fixture_create_session():
+    """Return a /clients/<UUID>/sessions response."""
+    return {
+        "version": 1,
+        "revision": 1,
+        "timestamp": "2018-06-19T23:04:24.672Z",
+        "timestamp_ms": 1529449464672,
+        "result_code": 0,
+        "result": {
+            "client_uuid": TILE_CLIENT_UUID,
+            "user": {
+                "user_uuid": TILE_USER_UUID,
+                "full_name": None,
+                "email": TILE_EMAIL,
+                "beta_eligibility": False,
+                "gift_recipient": True,
+                "locale": "en-US",
+                "email_shared": True,
+                "image_url": None,
+                "status": "ACTIVATED",
+                "pw_exists": True,
+                "linked_accounts": [],
+                "registration_timestamp": 1482711582203,
+                "last_modified_timestamp": 1529444807328
+            },
+            "session_start_timestamp": int(time() * 1000),
+            "session_expiration_timestamp": int(time() * 1000) + 1000,
+            "changes": "EXISTING_ACCOUNT"
+        }
+    }
 
 
-def test_basic_client(client_response_200, session_response_200, user_uuid):
+# pylint: disable=protected-access
+@pytest.mark.asyncio
+async def test_create(event_loop):
     """Test the creation of a client."""
-    with requests_mock.mock() as mock:
-        mock.put(
-            re.compile(CLIENT_URL_PATTERN),
-            text=json.dumps(client_response_200))
-        mock.post(
-            re.compile(SESSION_URL_PATTERN),
-            text=json.dumps(session_response_200))
-
-        client = pytile.Client('email@address.com', 'password12345')
-        assert client.user_uuid == user_uuid
+    async with aiohttp.ClientSession(loop=event_loop) as websession:
+        client = Client(TILE_EMAIL, TILE_PASSWORD, websession)
+        assert client._client_uuid != TILE_CLIENT_UUID
 
 
-def test_client_with_uuid(client_response_200, session_response_200,
-                          client_uuid, user_uuid):
+@pytest.mark.asyncio
+async def test_create_existing(event_loop):
     """Test the creation of a client with an existing client UUID."""
-    with requests_mock.mock() as mock:
-        mock.put(
-            re.compile(CLIENT_URL_PATTERN),
-            text=json.dumps(client_response_200))
-        mock.post(
-            re.compile(SESSION_URL_PATTERN),
-            text=json.dumps(session_response_200))
-
-        client = pytile.Client(
-            'email@address.com', 'password12345', client_uuid=client_uuid)
-        assert client.client_uuid == client_uuid
-        assert client.user_uuid == user_uuid
+    async with aiohttp.ClientSession(loop=event_loop) as websession:
+        client = Client(
+            TILE_EMAIL,
+            TILE_PASSWORD,
+            websession,
+            client_uuid=TILE_CLIENT_UUID)
+        assert client._client_uuid == TILE_CLIENT_UUID
 
 
-def test_get_tiles(tile_active_response_200, tile_list_response_200,
-                   client_response_200, session_response_200, user_uuid):
-    """Test getting a list of tiles back."""
-    with requests_mock.mock() as mock:
-        mock.put(
-            re.compile(CLIENT_URL_PATTERN),
-            text=json.dumps(client_response_200))
-        mock.post(
-            re.compile(SESSION_URL_PATTERN),
-            text=json.dumps(session_response_200))
-        mock.get(
-            '{0}/users/{1}/user_tiles'.format(TILE_API_BASE_URL, user_uuid),
-            text=json.dumps(tile_list_response_200))
-        mock.get(
-            '{0}/tiles'.format(TILE_API_BASE_URL),
-            text=json.dumps(tile_active_response_200))
+@pytest.mark.asyncio
+async def test_get_session(
+        aresponses, event_loop, fixture_create_client, fixture_create_session):
+    """Test initializing a client with a Tile session."""
+    aresponses.add(
+        'production.tile-api.com',
+        '/api/v1/clients/{0}'.format(TILE_CLIENT_UUID), 'put',
+        aresponses.Response(
+            text=json.dumps(fixture_create_client), status=200))
+    aresponses.add(
+        'production.tile-api.com',
+        '/api/v1/clients/{0}/sessions'.format(TILE_CLIENT_UUID), 'post',
+        aresponses.Response(
+            text=json.dumps(fixture_create_session), status=200))
 
-        client = pytile.Client('email@address.com', 'password12345')
-        assert client.user_uuid == user_uuid
+    async with aiohttp.ClientSession(loop=event_loop) as websession:
+        client = Client(
+            TILE_EMAIL,
+            TILE_PASSWORD,
+            websession,
+            client_uuid=TILE_CLIENT_UUID)
+        await client.get_session()
+        assert client._client_uuid == TILE_CLIENT_UUID
+        assert client._user_uuid == TILE_USER_UUID
 
-        tiles = client.get_tiles()
-        assert len(tiles) == len(tile_list_response_200['result'])
+
+@pytest.mark.asyncio
+async def test_bad_endpoint(aresponses, event_loop):
+    """Test that an exception is raised on a bad endpoint."""
+    aresponses.add(
+        'production.tile-api.com',
+        '/api/v1/bad_endpoint', 'get',
+        aresponses.Response(
+            text='', status=404))
+
+    with pytest.raises(RequestError):
+        async with aiohttp.ClientSession(loop=event_loop) as websession:
+            client = Client(
+                TILE_EMAIL,
+                TILE_PASSWORD,
+                websession,
+                client_uuid=TILE_CLIENT_UUID)
+            await client.request('get', 'bad_endpoint')
