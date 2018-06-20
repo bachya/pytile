@@ -22,7 +22,12 @@
 .. image:: https://img.shields.io/badge/SayThanks-!-1EAEDB.svg
   :target: https://saythanks.io/to/bachya
 
-pytile is a simple Python library for tracking Tile® Bluetooth trackers.
+pytile is a simple Python library for retrieving information on
+`Tile® Bluetooth trackers <https://www.thetileapp.com/en-us/>`_
+(including last location and more).
+
+This library is built on an unpublished, unofficial Tile API; it may alter or
+cease operation at any point.
 
 📡 PLEASE READ: 1.0.0 and Beyond
 ================================
