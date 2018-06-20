@@ -45,7 +45,7 @@ pytile, make sure to pin version 1.1.2.
 
   $ pip install pytile
 
-🌼 Usage
+📡 Usage
 ========
 
 .. code-block:: python
@@ -90,7 +90,7 @@ Then, get to it!
   client.tiles.all()
 
 
-🌼 Contributing
+📡 Contributing
 ===============
 
 #. `Check for open features/bugs <https://github.com/bachya/pytile/issues>`_
