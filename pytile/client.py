@@ -1,5 +1,5 @@
 """Define a client to interact with Pollen.com."""
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from aiohttp import ClientSession, client_exceptions
 
@@ -8,8 +8,9 @@ from .tile import Tile
 from .util import current_epoch_time
 
 API_URL_SCAFFOLD = 'https://production.tile-api.com/api/v1'
-TILE_APP_ID = 'ios-tile-production'
-TILE_APP_VERSION = '2.21.1'
+DEFAULT_APP_ID = 'ios-tile-production'
+DEFAULT_APP_VERSION = '2.31.0'
+DEFAULT_LOCALE = 'en-US'
 
 
 class Client(object):  # pylint: disable=too-many-instance-attributes
@@ -21,10 +22,10 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
             password: str,
             websession: ClientSession,
             *,
-            client_uuid: UUID = None,
-            locale: str = 'en-US') -> None:
+            client_uuid: str = None,
+            locale: str = DEFAULT_LOCALE) -> None:
         """Initialize."""
-        self._client_confirmed = False
+        self._client_established = False
         self._email = email
         self._locale = locale
         self._password = password
@@ -37,34 +38,32 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
         if not self._client_uuid:
             self._client_uuid = str(uuid4())
 
-    async def initialize(self):
+    async def get_session(self) -> None:
         """Create a Tile session."""
-        if not self._client_confirmed:
+        if not self._client_established:
             await self.request(
                 'put',
                 'clients/{0}'.format(self._client_uuid),
-                json={
-                    'app_id': TILE_APP_ID,
-                    'app_version': TILE_APP_VERSION,
-                    'locale': self._locale,
-                    'registration_timestamp': current_epoch_time(),
-                    'user_device_name': 'pytile Client'
+                data={
+                    'app_id': DEFAULT_APP_ID,
+                    'app_version': DEFAULT_APP_VERSION,
+                    'locale': self._locale
                 })
-            self._client_confirmed = True
+            self._client_established = True
 
-        data = await self.request(
+        resp = await self.request(
             'post',
             'clients/{0}/sessions'.format(self._client_uuid),
-            json={
+            data={
                 'email': self._email,
                 'password': self._password
             })
 
         if not self._user_uuid:
-            self._user_uuid = data['result']['user']['user_uuid']
-        self._session_expiry = data['result']['session_expiration_timestamp']
+            self._user_uuid = resp['result']['user']['user_uuid']
+        self._session_expiry = resp['result']['session_expiration_timestamp']
 
-        self.tiles = Tile(self.request, self._user_uuid)
+        self.tiles = Tile(self.request, self._user_uuid)  # type: ignore
 
     async def request(
             self,
@@ -73,7 +72,7 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
             *,
             headers: dict = None,
             params: dict = None,
-            json: dict = None) -> dict:
+            data: dict = None) -> dict:
         """Make a request against AirVisual."""
         if (self._session_expiry
                 and self._session_expiry <= current_epoch_time()):
@@ -84,17 +83,16 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
         if not headers:
             headers = {}
         headers.update({
-            'Tile_app_id': TILE_APP_ID,
-            'Tile_app_version': TILE_APP_VERSION,
-            'Tile_client_uuid': self._client_uuid
+            'Tile_app_id': DEFAULT_APP_ID,
+            'Tile_app_version': DEFAULT_APP_VERSION,
+            'Tile_client_uuid': self._client_uuid,
         })
 
         async with self._websession.request(method, url, headers=headers,
-                                            params=params, json=json) as resp:
+                                            params=params, data=data) as resp:
             try:
                 resp.raise_for_status()
-                data = await resp.json()
-                return data
+                return await resp.json(content_type=None)
             except client_exceptions.ClientError as err:
                 raise RequestError(
                     'Error requesting data from {0}: {1}'.format(
