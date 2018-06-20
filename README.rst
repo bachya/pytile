@@ -1,5 +1,5 @@
-pytile: A Simple Python Library for Tile® Bluetooth trackers
-============================================================
+📡 pytile: A simple Python API for Tile® Bluetooth trackers
+===========================================================
 
 .. image:: https://travis-ci.org/bachya/pytile.svg?branch=master
   :target: https://travis-ci.org/bachya/pytile
@@ -17,38 +17,81 @@ pytile: A Simple Python Library for Tile® Bluetooth trackers
   :target: https://codecov.io/gh/bachya/pytile
 
 .. image:: https://api.codeclimate.com/v1/badges/71eb642c735e33adcdfc/maintainability
-  :target: https://codeclimate.com/github/bachya/pytile
+   :target: https://codeclimate.com/github/bachya/pytile/maintainability
 
 .. image:: https://img.shields.io/badge/SayThanks-!-1EAEDB.svg
   :target: https://saythanks.io/to/bachya
 
-pytile is a simple Python library for retrieving information on `Tile® Bluetooth
-trackers <https://www.thetileapp.com>`_ (including last location and more).
+pytile is a simple Python library for tracking Tile® Bluetooth trackers.
 
-This library is built on an unpublished, unofficial Tile API; it may alter or
-cease operation at any point.
+📡 PLEASE READ: 1.0.0 and Beyond
+================================
 
-Installation
-============
+Version 1.0.0 of pytile makes several breaking, but necessary changes:
+
+* Moves the underlying library from
+  `Requests <http://docs.python-requests.org/en/master/>`_ to
+  `aiohttp <https://aiohttp.readthedocs.io/en/stable/>`_
+* Changes the entire library to use :code:`asyncio`
+* Makes 3.5 the minimum version of Python required
+
+If you wish to continue using the previous, synchronous version of
+pytile, make sure to pin version 1.1.2.
+
+📡 Installation
+===============
 
 .. code-block:: bash
 
   $ pip install pytile
 
-Usage
-=====
+🌼 Usage
+========
 
 .. code-block:: python
 
   import pytile
 
-  client = pytile.Client('email@address.com', 'password12345')
-  client.get_tiles()
+pytile starts within an
+`aiohttp <https://aiohttp.readthedocs.io/en/stable/>`_ :code:`ClientSession`:
 
-  # => {"version":1,"revision":1,"timestamp":"2017-11-03T20:21:48.855Z","timestamp_ms":1509740508855,"result_code":0,"result":{"12988abcd712":{"tileState":{"uuid":"1298add778","connectionStateCode": ....
+.. code-block:: python
 
-Contributing
-============
+  import asyncio
+
+  from aiohttp import ClientSession
+
+  from pytile import Client
+
+
+  async def main() -> None:
+      """Create the aiohttp session and run the example."""
+      async with ClientSession() as websession:
+          await run(websession)
+
+
+  async def run(websession):
+      """Run."""
+      # YOUR CODE HERE
+
+  asyncio.get_event_loop().run_until_complete(main())
+
+Create a client:
+
+.. code-block:: python
+
+  client = pytile.Client('<TILE EMAIL ADDRESS>', '<TILE_PASSWORD>', websession)
+
+Then, get to it!
+
+.. code-block:: python
+
+  # Get all Tiles associated with an account:
+  client.tiles.all()
+
+
+🌼 Contributing
+===============
 
 #. `Check for open features/bugs <https://github.com/bachya/pytile/issues>`_
    or `initiate a discussion on one <https://github.com/bachya/pytile/issues/new>`_.
