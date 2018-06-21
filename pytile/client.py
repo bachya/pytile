@@ -30,20 +30,20 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
         self._locale = locale
         self._password = password
         self._session_expiry = None
-        self._user_uuid = None
         self._websession = websession
         self.tiles = None
+        self.user_uuid = None
 
-        self._client_uuid = client_uuid
-        if not self._client_uuid:
-            self._client_uuid = str(uuid4())
+        self.client_uuid = client_uuid
+        if not self.client_uuid:
+            self.client_uuid = str(uuid4())
 
     async def get_session(self) -> None:
         """Create a Tile session."""
         if not self._client_established:
             await self.request(
                 'put',
-                'clients/{0}'.format(self._client_uuid),
+                'clients/{0}'.format(self.client_uuid),
                 data={
                     'app_id': DEFAULT_APP_ID,
                     'app_version': DEFAULT_APP_VERSION,
@@ -53,17 +53,17 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
 
         resp = await self.request(
             'post',
-            'clients/{0}/sessions'.format(self._client_uuid),
+            'clients/{0}/sessions'.format(self.client_uuid),
             data={
                 'email': self._email,
                 'password': self._password
             })
 
-        if not self._user_uuid:
-            self._user_uuid = resp['result']['user']['user_uuid']
+        if not self.user_uuid:
+            self.user_uuid = resp['result']['user']['user_uuid']
         self._session_expiry = resp['result']['session_expiration_timestamp']
 
-        self.tiles = Tile(self.request, self._user_uuid)  # type: ignore
+        self.tiles = Tile(self.request, self.user_uuid)  # type: ignore
 
     async def request(
             self,
@@ -85,7 +85,7 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
         headers.update({
             'Tile_app_id': DEFAULT_APP_ID,
             'Tile_app_version': DEFAULT_APP_VERSION,
-            'Tile_client_uuid': self._client_uuid,
+            'Tile_client_uuid': self.client_uuid,
         })
 
         async with self._websession.request(method, url, headers=headers,

@@ -77,7 +77,7 @@ async def test_create(event_loop):
     """Test the creation of a client."""
     async with aiohttp.ClientSession(loop=event_loop) as websession:
         client = Client(TILE_EMAIL, TILE_PASSWORD, websession)
-        assert client._client_uuid != TILE_CLIENT_UUID
+        assert client.client_uuid != TILE_CLIENT_UUID
 
 
 @pytest.mark.asyncio
@@ -89,7 +89,7 @@ async def test_create_existing(event_loop):
             TILE_PASSWORD,
             websession,
             client_uuid=TILE_CLIENT_UUID)
-        assert client._client_uuid == TILE_CLIENT_UUID
+        assert client.client_uuid == TILE_CLIENT_UUID
 
 
 @pytest.mark.asyncio
@@ -114,8 +114,8 @@ async def test_get_session(
             websession,
             client_uuid=TILE_CLIENT_UUID)
         await client.get_session()
-        assert client._client_uuid == TILE_CLIENT_UUID
-        assert client._user_uuid == TILE_USER_UUID
+        assert client.client_uuid == TILE_CLIENT_UUID
+        assert client.user_uuid == TILE_USER_UUID
 
 
 @pytest.mark.asyncio
