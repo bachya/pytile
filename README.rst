@@ -81,18 +81,19 @@ pytile starts within an
 
   asyncio.get_event_loop().run_until_complete(main())
 
-Create a client:
+Create a client and initialize it:
 
 .. code-block:: python
 
   client = pytile.Client('<TILE EMAIL ADDRESS>', '<TILE_PASSWORD>', websession)
+  await client.async_init()
 
 Then, get to it!
 
 .. code-block:: python
 
   # Get all Tiles associated with an account:
-  client.tiles.all()
+  await client.tiles.all()
 
 
 📡 Contributing

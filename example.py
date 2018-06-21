@@ -28,7 +28,7 @@ async def run(websession):
             'BaqPBzT)8uXQ@UPcqyjwDHuCu',
             websession,
             client_uuid='6a56daa3-1b70-4643-a509-62614d6ebc7b')
-        await client.get_session()
+        await client.async_init()
 
         # Work with Tile data:
         await tiles(client)

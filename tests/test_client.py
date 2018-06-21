@@ -93,7 +93,7 @@ async def test_create_existing(event_loop):
 
 
 @pytest.mark.asyncio
-async def test_get_session(
+async def test_async_init(
         aresponses, event_loop, fixture_create_client, fixture_create_session):
     """Test initializing a client with a Tile session."""
     aresponses.add(
@@ -113,7 +113,7 @@ async def test_get_session(
             TILE_PASSWORD,
             websession,
             client_uuid=TILE_CLIENT_UUID)
-        await client.get_session()
+        await client.async_init()
         assert client.client_uuid == TILE_CLIENT_UUID
         assert client.user_uuid == TILE_USER_UUID
 

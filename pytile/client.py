@@ -38,7 +38,7 @@ class Client(object):  # pylint: disable=too-many-instance-attributes
         if not self.client_uuid:
             self.client_uuid = str(uuid4())
 
-    async def get_session(self) -> None:
+    async def async_init(self) -> None:
         """Create a Tile session."""
         if not self._client_established:
             await self.request(

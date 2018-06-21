@@ -210,7 +210,7 @@ async def test_get_all(  # pylint: disable=too-many-arguments
             TILE_PASSWORD,
             websession,
             client_uuid=TILE_CLIENT_UUID)
-        await client.get_session()
+        await client.async_init()
         tiles = await client.tiles.all()
         assert tiles[0]['name'] == TILE_TILE_NAME
 
@@ -238,5 +238,5 @@ async def test_expired_session(
                 TILE_PASSWORD,
                 websession,
                 client_uuid=TILE_CLIENT_UUID)
-            await client.get_session()
+            await client.async_init()
             await client.tiles.all()
