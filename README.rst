@@ -29,7 +29,7 @@ pytile is a simple Python library for retrieving information on
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
 
-📡 PLEASE READ: 1.0.0 and Beyond
+📡 PLEASE READ: 2.0.0 and Beyond
 ================================
 
 Version 1.0.0 of pytile makes several breaking, but necessary changes:
@@ -41,7 +41,7 @@ Version 1.0.0 of pytile makes several breaking, but necessary changes:
 * Makes 3.5 the minimum version of Python required
 
 If you wish to continue using the previous, synchronous version of
-pytile, make sure to pin version 1.1.2.
+pytile, make sure to pin version 1.1.0.
 
 📡 Installation
 ===============
