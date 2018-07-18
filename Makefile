@@ -5,7 +5,7 @@ coverage:
 docs:
 	cd docs && make html
 flake8:
-	pipenv run flake8 regenmaschine
+	pipenv run flake8 pytile
 init:
 	pip install --upgrade pip pipenv
 	pipenv lock
@@ -13,6 +13,6 @@ init:
 publish:
 	python setup.py sdist bdist_wheel
 	pipenv run twine upload dist/*
-	rm -rf dist/ build/ .egg regenmaschine.egg-info/
+	rm -rf dist/ build/ .egg pytile.egg-info/
 test:
 	pipenv run detox
