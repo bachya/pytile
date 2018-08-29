@@ -24,10 +24,9 @@ async def run(websession):
     try:
         # Create a client:
         client = Client(
-            'bachya1208@gmail.com',
-            'BaqPBzT)8uXQ@UPcqyjwDHuCu',
-            websession,
-            client_uuid='6a56daa3-1b70-4643-a509-62614d6ebc7b')
+            '<EMAIL ADDRESS>',
+            '<PASSWORD>',
+            websession)
         await client.async_init()
 
         # Work with Tile data:
