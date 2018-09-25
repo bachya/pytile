@@ -2,7 +2,7 @@
 from typing import Awaitable, Callable
 
 
-class Tile(object):  # pylint: disable=too-few-public-methods
+class Tile:  # pylint: disable=too-few-public-methods
     """Define "Tile" endpoints."""
 
     def __init__(

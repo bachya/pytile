@@ -13,7 +13,7 @@ DEFAULT_APP_VERSION = '2.31.0'
 DEFAULT_LOCALE = 'en-US'
 
 
-class Client(object):  # pylint: disable=too-many-instance-attributes
+class Client:  # pylint: disable=too-many-instance-attributes
     """Define the client."""
 
     def __init__(

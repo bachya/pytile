@@ -1,14 +1,35 @@
+---
 sudo: false
-language: python
-python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
-install: "make init"
-script: "make ci"
-cache: "pip"
-jobs:
+matrix:
+  fast_finish: true
   include:
-    - stage: "coverage"
-      python: "3.6"
-      script: "pipenv run codecov"
+    - python: "3.6"
+      env: TOXENV=cov
+      after_success: codecov
+    - python: "3.6"
+      env: TOXENV=lint
+    - python: "3.6"
+      env: TOXENV=typing
+    - python: "3.6"
+      env: TOXENV=py36
+    - python: "3.7"
+      env: TOXENV=py37
+      dist: xenial
+      sudo: true
+    - python: "3.8-dev"
+      env: TOXENV=py38
+      dist: xenial
+      sudo: true
+      if: branch = dev AND type = push
+  allow_failures:
+    - python: "3.8-dev"
+      env: TOXENV=py38
+      dist: xenial
+      sudo: true
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+install: pip install -U codecov tox
+language: python
+script: tox --develop

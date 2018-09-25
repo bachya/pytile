@@ -1,10 +1,6 @@
-*.pyc
-.cache
-report.xml
-build/
-dist/
-*.egg-info/
-.mypy_cache
-.pytest_cache
-coverage.xml
 .coverage
+.mypy_cache
+.tox/
+Pipfile.lock
+coverage.xml
+pyden.egg-info

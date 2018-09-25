@@ -1,18 +1,16 @@
-ci:
-	pipenv run py.test --junitxml=report.xml
 coverage:
-	pipenv run py.test --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
-docs:
-	cd docs && make html
-flake8:
-	pipenv run flake8 pytile
+	pipenv run py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
 init:
 	pip install --upgrade pip pipenv
 	pipenv lock
 	pipenv install --dev
+lint:
+	pipenv run flake8 pytile
+	pipenv run pydocstyle pytile
+	pipenv run pylint pytile
 publish:
-	python setup.py sdist bdist_wheel
+	pipenv run python setup.py sdist bdist_wheel
 	pipenv run twine upload dist/*
 	rm -rf dist/ build/ .egg pytile.egg-info/
 test:
-	pipenv run detox
+	pipenv run py.test

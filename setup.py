@@ -19,7 +19,7 @@ DESCRIPTION = 'A simple Python API for Tile® Bluetooth trackers'
 URL = 'https://github.com/bachya/pytile'
 EMAIL = 'bachya1208@gmail.com'
 AUTHOR = 'Aaron Bach'
-REQUIRES_PYTHON = '>=3.5.0'
+REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 
 # What packages are required for this module to be executed?
@@ -38,7 +38,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
-with io.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
+with io.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
     LONG_DESC = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
@@ -118,8 +118,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
