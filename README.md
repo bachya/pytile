@@ -28,6 +28,17 @@ Version 2.0.0 of `pytile` makes several breaking, but necessary changes:
 If you wish to continue using the previous, synchronous version of `pytile`,
 make sure to pin version 1.1.0.
 
+# Python Versions
+
+`pytile` is currently supported on:
+
+* Python 3.5
+* Python 3.6
+* Python 3.7
+
+However, running the test suite currently requires Python 3.6 or higher; tests
+run on Python 3.5 will fail.
+
 # Installation
 
 ```python
