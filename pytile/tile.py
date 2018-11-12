@@ -27,6 +27,6 @@ class Tile:  # pylint: disable=too-few-public-methods
             'tiles',
             params=[('tile_uuids', uuid) for uuid in tile_uuid_list])
         return [
-            tile for tile in tile_data['result'].values() if show_inactive
-            or tile['tileState']['connection_state'] == 'READY'
+            tile for tile in tile_data['result'].values()
+            if show_inactive or tile['visible'] is True
         ]
