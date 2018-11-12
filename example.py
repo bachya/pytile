@@ -7,32 +7,21 @@ from pytile import Client
 from pytile.errors import TileError
 
 
-async def tiles(client: Client) -> None:
-    """Output allergen-related information."""
-    print('ALL TILES')
-    print(await client.tiles.all())
-
-
-async def main() -> None:
-    """Create the aiohttp session and run the example."""
-    async with ClientSession() as websession:
-        await run(websession)
-
-
-async def run(websession):
+async def main():
     """Run."""
-    try:
-        # Create a client:
-        client = Client(
-            '<EMAIL ADDRESS>',
-            '<PASSWORD>',
-            websession)
-        await client.async_init()
+    async with ClientSession() as websession:
+        try:
+            # Create a client:
+            client = Client('<EMAIL>', '<PASSWORD', websession)
+            await client.async_init()
 
-        # Work with Tile data:
-        await tiles(client)
-    except TileError as err:
-        print(err)
+            print('Showing active Tiles:')
+            print(await client.tiles.all())
+
+            print('Showing all Tiles:')
+            print(await client.tiles.all(show_inactive=True))
+        except TileError as err:
+            print(err)
 
 
 asyncio.get_event_loop().run_until_complete(main())
