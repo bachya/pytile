@@ -15,6 +15,5 @@ tox = "*"
 twine = "*"
 
 [packages]
-aiodns = "*"
 aiohttp = "*"
 async-timeout = "*"
