@@ -12,7 +12,7 @@ async def main():
     async with ClientSession() as websession:
         try:
             # Create a client:
-            client = Client('<EMAIL>', '<PASSWORD', websession)
+            client = Client('<EMAIL>', '<PASSWORD>', websession)
             await client.async_init()
 
             print('Showing active Tiles:')
