@@ -48,7 +48,8 @@ pip install pytile
 # Usage
 
 `pytile` starts within an
-[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession`:
+[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession` (if you are receiving SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))` instead):
+
 
 ```python
 import asyncio
@@ -80,7 +81,7 @@ from pytile import Client
 async def main() -> None:
     """Create the aiohttp session and run the example."""
     async with ClientSession() as websession:
-    client = pytile.Client("<EMAIL>", "<PASSWORD>", websession)
+    client = Client("<EMAIL>", "<PASSWORD>", websession)
     await client.async_init()
 
     # Get all Tiles associated with an account:
