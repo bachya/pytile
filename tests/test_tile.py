@@ -10,69 +10,83 @@ from pytile import Client
 from pytile.errors import SessionExpiredError
 
 from .const import (
-    TILE_CLIENT_UUID, TILE_EMAIL, TILE_PASSWORD, TILE_TILE_NAME,
-    TILE_USER_UUID)
+    TILE_CLIENT_UUID,
+    TILE_EMAIL,
+    TILE_PASSWORD,
+    TILE_TILE_NAME,
+    TILE_USER_UUID,
+)
 from .fixtures import *  # noqa
 from .fixtures.tile import *  # noqa
 
 
 @pytest.mark.asyncio  # noqa
 async def test_get_all(  # pylint: disable=too-many-arguments
-        aresponses, event_loop, fixture_tile_details, fixture_tile_list,
-        fixture_create_client, fixture_create_session):
+    aresponses,
+    event_loop,
+    fixture_tile_details,
+    fixture_tile_list,
+    fixture_create_client,
+    fixture_create_session,
+):
     """Test getting details on all of a user's tiles."""
     aresponses.add(
-        'production.tile-api.com',
-        '/api/v1/clients/{0}'.format(TILE_CLIENT_UUID), 'put',
-        aresponses.Response(
-            text=json.dumps(fixture_create_client), status=200))
+        "production.tile-api.com",
+        "/api/v1/clients/{0}".format(TILE_CLIENT_UUID),
+        "put",
+        aresponses.Response(text=json.dumps(fixture_create_client), status=200),
+    )
     aresponses.add(
-        'production.tile-api.com',
-        '/api/v1/clients/{0}/sessions'.format(TILE_CLIENT_UUID), 'post',
-        aresponses.Response(
-            text=json.dumps(fixture_create_session), status=200))
+        "production.tile-api.com",
+        "/api/v1/clients/{0}/sessions".format(TILE_CLIENT_UUID),
+        "post",
+        aresponses.Response(text=json.dumps(fixture_create_session), status=200),
+    )
     aresponses.add(
-        'production.tile-api.com',
-        '/api/v1/users/{0}/user_tiles'.format(TILE_USER_UUID), 'get',
-        aresponses.Response(text=json.dumps(fixture_tile_list), status=200))
+        "production.tile-api.com",
+        "/api/v1/users/{0}/user_tiles".format(TILE_USER_UUID),
+        "get",
+        aresponses.Response(text=json.dumps(fixture_tile_list), status=200),
+    )
     aresponses.add(
-        'production.tile-api.com', '/api/v1/tiles', 'get',
-        aresponses.Response(text=json.dumps(fixture_tile_details), status=200))
+        "production.tile-api.com",
+        "/api/v1/tiles",
+        "get",
+        aresponses.Response(text=json.dumps(fixture_tile_details), status=200),
+    )
 
     async with aiohttp.ClientSession(loop=event_loop) as websession:
         client = Client(
-            TILE_EMAIL,
-            TILE_PASSWORD,
-            websession,
-            client_uuid=TILE_CLIENT_UUID)
+            TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
+        )
         await client.async_init()
         tiles = await client.tiles.all()
 
-        assert tiles[0]['name'] == TILE_TILE_NAME
+        assert tiles[0]["name"] == TILE_TILE_NAME
 
 
 @pytest.mark.asyncio  # noqa
 async def test_expired_session(
-        aresponses, event_loop, fixture_create_client,
-        fixture_expired_session):
+    aresponses, event_loop, fixture_create_client, fixture_expired_session
+):
     """Test raising an exception on an expired session."""
     aresponses.add(
-        'production.tile-api.com',
-        '/api/v1/clients/{0}'.format(TILE_CLIENT_UUID), 'put',
-        aresponses.Response(
-            text=json.dumps(fixture_create_client), status=200))
+        "production.tile-api.com",
+        "/api/v1/clients/{0}".format(TILE_CLIENT_UUID),
+        "put",
+        aresponses.Response(text=json.dumps(fixture_create_client), status=200),
+    )
     aresponses.add(
-        'production.tile-api.com',
-        '/api/v1/clients/{0}/sessions'.format(TILE_CLIENT_UUID), 'post',
-        aresponses.Response(
-            text=json.dumps(fixture_expired_session), status=200))
+        "production.tile-api.com",
+        "/api/v1/clients/{0}/sessions".format(TILE_CLIENT_UUID),
+        "post",
+        aresponses.Response(text=json.dumps(fixture_expired_session), status=200),
+    )
 
     with pytest.raises(SessionExpiredError):
         async with aiohttp.ClientSession(loop=event_loop) as websession:
             client = Client(
-                TILE_EMAIL,
-                TILE_PASSWORD,
-                websession,
-                client_uuid=TILE_CLIENT_UUID)
+                TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
+            )
             await client.async_init()
             await client.tiles.all()

@@ -12,13 +12,13 @@ async def main():
     async with ClientSession() as websession:
         try:
             # Create a client:
-            client = Client('<EMAIL>', '<PASSWORD>', websession)
+            client = Client("<EMAIL>", "<PASSWORD>", websession)
             await client.async_init()
 
-            print('Showing active Tiles:')
+            print("Showing active Tiles:")
             print(await client.tiles.all())
 
-            print('Showing all Tiles:')
+            print("Showing all Tiles:")
             print(await client.tiles.all(show_inactive=True))
         except TileError as err:
             print(err)

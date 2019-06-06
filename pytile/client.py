@@ -7,23 +7,24 @@ from .errors import RequestError, SessionExpiredError
 from .tile import Tile
 from .util import current_epoch_time
 
-API_URL_SCAFFOLD = 'https://production.tile-api.com/api/v1'
-DEFAULT_APP_ID = 'ios-tile-production'
-DEFAULT_APP_VERSION = '2.31.0'
-DEFAULT_LOCALE = 'en-US'
+API_URL_SCAFFOLD = "https://production.tile-api.com/api/v1"
+DEFAULT_APP_ID = "ios-tile-production"
+DEFAULT_APP_VERSION = "2.31.0"
+DEFAULT_LOCALE = "en-US"
 
 
 class Client:  # pylint: disable=too-many-instance-attributes
     """Define the client."""
 
     def __init__(
-            self,
-            email: str,
-            password: str,
-            websession: ClientSession,
-            *,
-            client_uuid: str = None,
-            locale: str = DEFAULT_LOCALE) -> None:
+        self,
+        email: str,
+        password: str,
+        websession: ClientSession,
+        *,
+        client_uuid: str = None,
+        locale: str = DEFAULT_LOCALE
+    ) -> None:
         """Initialize."""
         self._client_established = False
         self._email = email
@@ -42,58 +43,60 @@ class Client:  # pylint: disable=too-many-instance-attributes
         """Create a Tile session."""
         if not self._client_established:
             await self.request(
-                'put',
-                'clients/{0}'.format(self.client_uuid),
+                "put",
+                "clients/{0}".format(self.client_uuid),
                 data={
-                    'app_id': DEFAULT_APP_ID,
-                    'app_version': DEFAULT_APP_VERSION,
-                    'locale': self._locale
-                })
+                    "app_id": DEFAULT_APP_ID,
+                    "app_version": DEFAULT_APP_VERSION,
+                    "locale": self._locale,
+                },
+            )
             self._client_established = True
 
         resp = await self.request(
-            'post',
-            'clients/{0}/sessions'.format(self.client_uuid),
-            data={
-                'email': self._email,
-                'password': self._password
-            })
+            "post",
+            "clients/{0}/sessions".format(self.client_uuid),
+            data={"email": self._email, "password": self._password},
+        )
 
         if not self.user_uuid:
-            self.user_uuid = resp['result']['user']['user_uuid']
-        self._session_expiry = resp['result']['session_expiration_timestamp']
+            self.user_uuid = resp["result"]["user"]["user_uuid"]
+        self._session_expiry = resp["result"]["session_expiration_timestamp"]
 
         self.tiles = Tile(self.request, self.user_uuid)  # type: ignore
 
     async def request(
-            self,
-            method: str,
-            endpoint: str,
-            *,
-            headers: dict = None,
-            params: dict = None,
-            data: dict = None) -> dict:
+        self,
+        method: str,
+        endpoint: str,
+        *,
+        headers: dict = None,
+        params: dict = None,
+        data: dict = None
+    ) -> dict:
         """Make a request against AirVisual."""
-        if (self._session_expiry
-                and self._session_expiry <= current_epoch_time()):
-            raise SessionExpiredError('Session has expired; make a new one!')
+        if self._session_expiry and self._session_expiry <= current_epoch_time():
+            raise SessionExpiredError("Session has expired; make a new one!")
 
-        url = '{0}/{1}'.format(API_URL_SCAFFOLD, endpoint)
+        url = "{0}/{1}".format(API_URL_SCAFFOLD, endpoint)
 
         if not headers:
             headers = {}
-        headers.update({
-            'Tile_app_id': DEFAULT_APP_ID,
-            'Tile_app_version': DEFAULT_APP_VERSION,
-            'Tile_client_uuid': self.client_uuid,
-        })
+        headers.update(
+            {
+                "Tile_app_id": DEFAULT_APP_ID,
+                "Tile_app_version": DEFAULT_APP_VERSION,
+                "Tile_client_uuid": self.client_uuid,
+            }
+        )
 
-        async with self._websession.request(method, url, headers=headers,
-                                            params=params, data=data) as resp:
+        async with self._websession.request(
+            method, url, headers=headers, params=params, data=data
+        ) as resp:
             try:
                 resp.raise_for_status()
                 return await resp.json(content_type=None)
             except client_exceptions.ClientError as err:
                 raise RequestError(
-                    'Error requesting data from {0}: {1}'.format(
-                        endpoint, err)) from None
+                    "Error requesting data from {0}: {1}".format(endpoint, err)
+                ) from None

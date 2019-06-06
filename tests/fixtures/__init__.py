@@ -27,8 +27,8 @@ def fixture_create_client():
             "registration_timestamp": 1529449412870,
             "user_device_name": None,
             "beta_option": False,
-            "last_modified_timestamp": 1529449412870
-        }
+            "last_modified_timestamp": 1529449412870,
+        },
     }
 
 
@@ -56,10 +56,10 @@ def fixture_create_session():
                 "pw_exists": True,
                 "linked_accounts": [],
                 "registration_timestamp": 1482711582203,
-                "last_modified_timestamp": 1529444807328
+                "last_modified_timestamp": 1529444807328,
             },
             "session_start_timestamp": int(time() * 1000),
             "session_expiration_timestamp": int(time() * 1000) + 1000,
-            "changes": "EXISTING_ACCOUNT"
-        }
+            "changes": "EXISTING_ACCOUNT",
+        },
     }
