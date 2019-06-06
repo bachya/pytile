@@ -6,6 +6,7 @@ verify_ssl = true
 "flake8" = "*"
 aresponses = "*"
 mypy = "*"
+pre-commit = "*"
 pydocstyle = "*"
 pylint = "*"
 pytest-aiohttp = "*"
