@@ -12,9 +12,7 @@ class Tile:  # pylint: disable=too-few-public-methods
 
     async def all(self, whitelist: list = None, show_inactive: bool = False) -> list:
         """Get all Tiles for a user's account."""
-        list_data = await self._request(
-            "get", "users/{0}/user_tiles".format(self._user_uuid)
-        )
+        list_data = await self._request("get", f"users/{self._user_uuid}/user_tiles")
         tile_uuid_list = [
             tile["tile_uuid"]
             for tile in list_data["result"]

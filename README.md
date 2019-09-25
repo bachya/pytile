@@ -32,12 +32,8 @@ make sure to pin version 1.1.0.
 
 `pytile` is currently supported on:
 
-* Python 3.5
 * Python 3.6
 * Python 3.7
-
-However, running the test suite currently requires Python 3.6 or higher; tests
-run on Python 3.5 will fail.
 
 # Installation
 

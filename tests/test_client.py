@@ -39,13 +39,13 @@ async def test_async_init(
     """Test initializing a client with a Tile session."""
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
         aresponses.Response(text=json.dumps(fixture_create_client), status=200),
     )
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}/sessions".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
         "post",
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
