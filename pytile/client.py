@@ -1,5 +1,6 @@
 """Define a client to interact with Pollen.com."""
-from uuid import uuid4
+from typing import Optional
+from uuid import UUID, uuid4
 
 from aiohttp import ClientSession, client_exceptions
 
@@ -7,10 +8,10 @@ from .errors import RequestError, SessionExpiredError
 from .tile import Tile
 from .util import current_epoch_time
 
-API_URL_SCAFFOLD = "https://production.tile-api.com/api/v1"
-DEFAULT_APP_ID = "ios-tile-production"
-DEFAULT_APP_VERSION = "2.31.0"
-DEFAULT_LOCALE = "en-US"
+API_URL_SCAFFOLD: str = "https://production.tile-api.com/api/v1"
+DEFAULT_APP_ID: str = "ios-tile-production"
+DEFAULT_APP_VERSION: str = "2.31.0"
+DEFAULT_LOCALE: str = "en-US"
 
 
 class Client:  # pylint: disable=too-many-instance-attributes
@@ -22,22 +23,22 @@ class Client:  # pylint: disable=too-many-instance-attributes
         password: str,
         websession: ClientSession,
         *,
-        client_uuid: str = None,
+        client_uuid: Optional[UUID] = None,
         locale: str = DEFAULT_LOCALE,
     ) -> None:
         """Initialize."""
-        self._client_established = False
-        self._email = email
-        self._locale = locale
-        self._password = password
-        self._session_expiry = None
-        self._websession = websession
-        self.tiles = None
-        self.user_uuid = None
+        self._client_established: bool = False
+        self._email: str = email
+        self._locale: str = locale
+        self._password: str = password
+        self._session_expiry: Optional[int] = None
+        self._websession: ClientSession = websession
+        self.tiles: Optional[Tile] = None
+        self.user_uuid: Optional[UUID] = None
 
-        self.client_uuid = client_uuid
+        self.client_uuid: Optional[UUID] = client_uuid
         if not self.client_uuid:
-            self.client_uuid = str(uuid4())
+            self.client_uuid = uuid4()
 
     async def async_init(self) -> None:
         """Create a Tile session."""
@@ -53,7 +54,7 @@ class Client:  # pylint: disable=too-many-instance-attributes
             )
             self._client_established = True
 
-        resp = await self.request(
+        resp: dict = await self.request(
             "post",
             f"clients/{self.client_uuid}/sessions",
             data={"email": self._email, "password": self._password},
@@ -63,16 +64,16 @@ class Client:  # pylint: disable=too-many-instance-attributes
             self.user_uuid = resp["result"]["user"]["user_uuid"]
         self._session_expiry = resp["result"]["session_expiration_timestamp"]
 
-        self.tiles = Tile(self.request, self.user_uuid)  # type: ignore
+        self.tiles = Tile(self.request, user_uuid=self.user_uuid)
 
     async def request(
         self,
         method: str,
         endpoint: str,
         *,
-        headers: dict = None,
-        params: dict = None,
-        data: dict = None,
+        headers: Optional[dict] = None,
+        params: Optional[dict] = None,
+        data: Optional[dict] = None,
     ) -> dict:
         """Make a request against AirVisual."""
         if self._session_expiry and self._session_expiry <= current_epoch_time():
