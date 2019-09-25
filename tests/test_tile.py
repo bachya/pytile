@@ -32,19 +32,19 @@ async def test_get_all(  # pylint: disable=too-many-arguments
     """Test getting details on all of a user's tiles."""
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
         aresponses.Response(text=json.dumps(fixture_create_client), status=200),
     )
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}/sessions".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
         "post",
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/users/{0}/user_tiles".format(TILE_USER_UUID),
+        f"/api/v1/users/{TILE_USER_UUID}/user_tiles",
         "get",
         aresponses.Response(text=json.dumps(fixture_tile_list), status=200),
     )
@@ -72,13 +72,13 @@ async def test_expired_session(
     """Test raising an exception on an expired session."""
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
         aresponses.Response(text=json.dumps(fixture_create_client), status=200),
     )
     aresponses.add(
         "production.tile-api.com",
-        "/api/v1/clients/{0}/sessions".format(TILE_CLIENT_UUID),
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
         "post",
         aresponses.Response(text=json.dumps(fixture_expired_session), status=200),
     )

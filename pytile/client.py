@@ -23,7 +23,7 @@ class Client:  # pylint: disable=too-many-instance-attributes
         websession: ClientSession,
         *,
         client_uuid: str = None,
-        locale: str = DEFAULT_LOCALE
+        locale: str = DEFAULT_LOCALE,
     ) -> None:
         """Initialize."""
         self._client_established = False
@@ -44,7 +44,7 @@ class Client:  # pylint: disable=too-many-instance-attributes
         if not self._client_established:
             await self.request(
                 "put",
-                "clients/{0}".format(self.client_uuid),
+                f"clients/{self.client_uuid}",
                 data={
                     "app_id": DEFAULT_APP_ID,
                     "app_version": DEFAULT_APP_VERSION,
@@ -55,7 +55,7 @@ class Client:  # pylint: disable=too-many-instance-attributes
 
         resp = await self.request(
             "post",
-            "clients/{0}/sessions".format(self.client_uuid),
+            f"clients/{self.client_uuid}/sessions",
             data={"email": self._email, "password": self._password},
         )
 
@@ -72,13 +72,11 @@ class Client:  # pylint: disable=too-many-instance-attributes
         *,
         headers: dict = None,
         params: dict = None,
-        data: dict = None
+        data: dict = None,
     ) -> dict:
         """Make a request against AirVisual."""
         if self._session_expiry and self._session_expiry <= current_epoch_time():
             raise SessionExpiredError("Session has expired; make a new one!")
-
-        url = "{0}/{1}".format(API_URL_SCAFFOLD, endpoint)
 
         if not headers:
             headers = {}
@@ -91,12 +89,16 @@ class Client:  # pylint: disable=too-many-instance-attributes
         )
 
         async with self._websession.request(
-            method, url, headers=headers, params=params, data=data
+            method,
+            f"{API_URL_SCAFFOLD}/{endpoint}",
+            headers=headers,
+            params=params,
+            data=data,
         ) as resp:
             try:
                 resp.raise_for_status()
                 return await resp.json(content_type=None)
             except client_exceptions.ClientError as err:
                 raise RequestError(
-                    "Error requesting data from {0}: {1}".format(endpoint, err)
+                    f"Error requesting data from {endpoint}: {err}"
                 ) from None
