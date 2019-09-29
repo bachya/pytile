@@ -85,7 +85,7 @@ class Client:  # pylint: disable=too-many-instance-attributes
             {
                 "Tile_app_id": DEFAULT_APP_ID,
                 "Tile_app_version": DEFAULT_APP_VERSION,
-                "Tile_client_uuid": self.client_uuid,
+                "Tile_client_uuid": str(self.client_uuid),
             }
         )
 
