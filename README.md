@@ -15,19 +15,6 @@ location and more).
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
 
-# PLEASE READ: Version 2.0.0 and Beyond
-
-Version 2.0.0 of `pytile` makes several breaking, but necessary changes:
-
-* Moves the underlying library from
-  [Requests](http://docs.python-requests.org/en/master/) to
-  [aiohttp](https://aiohttp.readthedocs.io/en/stable/)
-* Changes the entire library to use `asyncio`
-* Makes 3.6 the minimum version of Python required
-
-If you wish to continue using the previous, synchronous version of `pytile`,
-make sure to pin version 1.1.0.
-
 # Python Versions
 
 `pytile` is currently supported on:
