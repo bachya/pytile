@@ -61,13 +61,13 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from pytile import login
+from pytile import async_login
 
 
 async def main() -> None:
     """Create the aiohttp session and run the example."""
     async with ClientSession() as websession:
-        client = await login("<EMAIL>", "<PASSWORD>", websession)
+        client = await async_login("<EMAIL>", "<PASSWORD>", websession)
 
         # Get all Tiles associated with an account:
         await client.tiles.all()
@@ -85,13 +85,13 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from pytile import login
+from pytile import async_login
 
 
 async def main() -> None:
     """Create the aiohttp session and run the example."""
     async with ClientSession() as websession:
-        client = await login(
+        client = await async_login(
             "<EMAIL>", "<PASSWORD>", websession, client_uuid="MY_UUID", locale="en-GB"
         )
 
