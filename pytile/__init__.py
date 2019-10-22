@@ -1,2 +1,2 @@
 """Define module-level imports."""
-from .client import login  # noqa
+from .client import async_login  # noqa

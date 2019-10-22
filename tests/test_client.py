@@ -7,7 +7,7 @@ from uuid import UUID
 import aiohttp
 import pytest
 
-from pytile import login
+from pytile import async_login
 from pytile.errors import RequestError
 
 from .const import TILE_CLIENT_UUID, TILE_EMAIL, TILE_PASSWORD, TILE_USER_UUID
@@ -40,7 +40,7 @@ async def test_bad_endpoint(
 
     with pytest.raises(RequestError):
         async with aiohttp.ClientSession(loop=event_loop) as websession:
-            client = await login(
+            client = await async_login(
                 TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
             )
             await client._request("get", "bad_endpoint")
@@ -68,7 +68,7 @@ async def test_login(
     )
 
     async with aiohttp.ClientSession(loop=event_loop) as websession:
-        client = await login(TILE_EMAIL, TILE_PASSWORD, websession)
+        client = await async_login(TILE_EMAIL, TILE_PASSWORD, websession)
         assert isinstance(client.client_uuid, UUID)
         assert client.client_uuid != TILE_CLIENT_UUID
         assert client.user_uuid == TILE_USER_UUID
@@ -93,7 +93,7 @@ async def test_login_existing(
     )
 
     async with aiohttp.ClientSession(loop=event_loop) as websession:
-        client = await login(
+        client = await async_login(
             TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
         )
         assert client.client_uuid == TILE_CLIENT_UUID

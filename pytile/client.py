@@ -107,7 +107,7 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self.tiles = Tile(self._request, user_uuid=self.user_uuid)
 
 
-async def login(
+async def async_login(
     email: str,
     password: str,
     websession: ClientSession,
