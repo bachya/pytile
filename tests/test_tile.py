@@ -6,7 +6,7 @@ import json
 import aiohttp
 import pytest
 
-from pytile import Client
+from pytile import async_login
 from pytile.errors import SessionExpiredError
 
 from .const import (
@@ -56,10 +56,9 @@ async def test_get_all(  # pylint: disable=too-many-arguments
     )
 
     async with aiohttp.ClientSession(loop=event_loop) as websession:
-        client = Client(
+        client = await async_login(
             TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
         )
-        await client.async_init()
         tiles = await client.tiles.all()
 
         assert tiles[0]["name"] == TILE_TILE_NAME
@@ -85,8 +84,7 @@ async def test_expired_session(
 
     with pytest.raises(SessionExpiredError):
         async with aiohttp.ClientSession(loop=event_loop) as websession:
-            client = Client(
+            client = await async_login(
                 TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
             )
-            await client.async_init()
             await client.tiles.all()

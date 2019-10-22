@@ -3,7 +3,7 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from pytile import Client
+from pytile import login
 from pytile.errors import TileError
 
 
@@ -12,8 +12,7 @@ async def main():
     async with ClientSession() as websession:
         try:
             # Create a client:
-            client = Client("<EMAIL>", "<PASSWORD>", websession)
-            await client.async_init()
+            client = await login("<EMAIL>", "<PASSWORD>", websession)
 
             print("Showing active Tiles:")
             print(await client.tiles.all())

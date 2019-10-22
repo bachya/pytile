@@ -15,19 +15,6 @@ location and more).
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
 
-# PLEASE READ: Version 2.0.0 and Beyond
-
-Version 2.0.0 of `pytile` makes several breaking, but necessary changes:
-
-* Moves the underlying library from
-  [Requests](http://docs.python-requests.org/en/master/) to
-  [aiohttp](https://aiohttp.readthedocs.io/en/stable/)
-* Changes the entire library to use `asyncio`
-* Makes 3.6 the minimum version of Python required
-
-If you wish to continue using the previous, synchronous version of `pytile`,
-make sure to pin version 1.1.0.
-
 # Python Versions
 
 `pytile` is currently supported on:
@@ -44,7 +31,7 @@ pip install pytile
 # Usage
 
 `pytile` starts within an
-[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession` (if you are receiving SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))` instead):
+[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession:
 
 
 ```python
@@ -58,11 +45,14 @@ from pytile import Client
 async def main() -> None:
     """Create the aiohttp session and run the example."""
     async with ClientSession() as websession:
-      # YOUR CODE HERE
+        # YOUR CODE HERE
 
 
 asyncio.get_event_loop().run_until_complete(main())
 ```
+
+If you receive SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))`
+instead.
 
 Create a client, initialize it, and get to work:
 
@@ -71,17 +61,42 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from pytile import Client
+from pytile import login
 
 
 async def main() -> None:
     """Create the aiohttp session and run the example."""
     async with ClientSession() as websession:
-    client = Client("<EMAIL>", "<PASSWORD>", websession)
-    await client.async_init()
+        client = await login("<EMAIL>", "<PASSWORD>", websession)
 
-    # Get all Tiles associated with an account:
-    await client.tiles.all()
+        # Get all Tiles associated with an account:
+        await client.tiles.all()
+
+
+asyncio.get_event_loop().run_until_complete(main())
+```
+
+If for some reason you need to use a specific client UUID (to, say, ensure that the
+Tile API sees you as a client it's seen before) or a specific locale, you can do
+so easily:
+
+```python
+import asyncio
+
+from aiohttp import ClientSession
+
+from pytile import login
+
+
+async def main() -> None:
+    """Create the aiohttp session and run the example."""
+    async with ClientSession() as websession:
+        client = await login(
+            "<EMAIL>", "<PASSWORD>", websession, client_uuid="MY_UUID", locale="en-GB"
+        )
+
+        # Get all Tiles associated with an account:
+        await client.tiles.all()
 
 
 asyncio.get_event_loop().run_until_complete(main())
