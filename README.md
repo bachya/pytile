@@ -51,7 +51,7 @@ async def main() -> None:
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-If you receive SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))
+If you receive SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))`
 instead.
 
 Create a client, initialize it, and get to work:
