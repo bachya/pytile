@@ -10,7 +10,7 @@ from .util import current_epoch_time
 
 API_URL_SCAFFOLD: str = "https://production.tile-api.com/api/v1"
 DEFAULT_APP_ID: str = "ios-tile-production"
-DEFAULT_APP_VERSION: str = "2.31.0"
+DEFAULT_APP_VERSION: str = "2.55.1.3707"
 DEFAULT_LOCALE: str = "en-US"
 
 
