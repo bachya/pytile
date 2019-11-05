@@ -1,6 +1,6 @@
 """Define a client to interact with Pollen.com."""
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from aiohttp import ClientSession, client_exceptions
 
@@ -23,7 +23,7 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         password: str,
         websession: ClientSession,
         *,
-        client_uuid: Optional[UUID] = None,
+        client_uuid: Optional[str] = None,
         locale: str = DEFAULT_LOCALE,
     ) -> None:
         """Initialize."""
@@ -34,11 +34,11 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self._session_expiry: Optional[int] = None
         self._websession: ClientSession = websession
         self.tiles: Optional[Tile] = None
-        self.user_uuid: Optional[UUID] = None
+        self.user_uuid: Optional[str] = None
 
-        self.client_uuid: UUID
+        self.client_uuid: str
         if not client_uuid:
-            self.client_uuid = uuid4()
+            self.client_uuid = str(uuid4())
         else:
             self.client_uuid = client_uuid
 
@@ -61,7 +61,7 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
             {
                 "Tile_app_id": DEFAULT_APP_ID,
                 "Tile_app_version": DEFAULT_APP_VERSION,
-                "Tile_client_uuid": str(self.client_uuid),
+                "Tile_client_uuid": self.client_uuid,
             }
         )
 
@@ -112,7 +112,7 @@ async def async_login(
     password: str,
     websession: ClientSession,
     *,
-    client_uuid: Optional[UUID] = None,
+    client_uuid: Optional[str] = None,
     locale: str = DEFAULT_LOCALE,
 ) -> Client:
     """Return an authenticated client."""

@@ -2,7 +2,6 @@
 # pylint: disable=redefined-outer-name,unused-import
 import json
 import re
-from uuid import UUID
 
 import aiohttp
 import pytest
@@ -69,7 +68,7 @@ async def test_login(
 
     async with aiohttp.ClientSession(loop=event_loop) as websession:
         client = await async_login(TILE_EMAIL, TILE_PASSWORD, websession)
-        assert isinstance(client.client_uuid, UUID)
+        assert isinstance(client.client_uuid, str)
         assert client.client_uuid != TILE_CLIENT_UUID
         assert client.user_uuid == TILE_USER_UUID
 
