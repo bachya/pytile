@@ -32,7 +32,7 @@ pip install pytile
 # Usage
 
 `pytile` starts within an
-[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession:
+[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession`:
 
 
 ```python
@@ -53,7 +53,24 @@ asyncio.get_event_loop().run_until_complete(main())
 ```
 
 If you receive SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))`
-instead.
+instead:
+
+```python
+import asyncio
+
+from aiohttp import ClientSession, TCPConnector
+
+from pytile import Client
+
+
+async def main() -> None:
+    """Create the aiohttp session and run the example."""
+    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as websession:
+        # YOUR CODE HERE
+
+
+asyncio.get_event_loop().run_until_complete(main())
+```
 
 Create a client, initialize it, and get to work:
 
