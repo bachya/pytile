@@ -1,6 +1,6 @@
 # 📡 pytile: A simple Python API for Tile® Bluetooth trackers
 
-[![Travis CI](https://travis-ci.org/bachya/pytile.svg?branch=master)](https://travis-ci.org/bachya/pytile)
+[![CI](https://github.com/bachya/pytile/workflows/CI/badge.svg)](https://github.com/bachya/pytile/actions)
 [![PyPi](https://img.shields.io/pypi/v/pytile.svg)](https://pypi.python.org/pypi/pytile)
 [![Version](https://img.shields.io/pypi/pyversions/pytile.svg)](https://pypi.python.org/pypi/pytile)
 [![License](https://img.shields.io/pypi/l/pytile.svg)](https://github.com/bachya/pytile/blob/master/LICENSE)
