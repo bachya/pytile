@@ -23,6 +23,7 @@ python = "^3.6.0"
 
 [tool.poetry.dev-dependencies]
 aresponses = "^1.1.1"
+black = "^19.10b0"
 flake8 = "^3.7.9"
 mypy = "^0.740"
 pre-commit = "^1.20.0"
@@ -30,50 +31,6 @@ pydocstyle = "^4.0.1"
 pylint = "^2.4.3"
 pytest-aiohttp = "^0.3.0"
 pytest-cov = "^2.8.1"
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py36, py37, py38, cov, lint, typing
-skip_missing_interpreters = True
-skipsdist=True
-
-[testenv]
-whitelist_externals=
-    poetry
-    py.test
-commands=
-    poetry install
-    py.test
-
-[testenv:cov]
-whitelist_externals=
-    poetry
-    py.test
-commands=
-    poetry install
-    py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
-
-[testenv:lint]
-whitelist_externals=
-    flake8
-    poetry
-    pydocstyle
-    pylint
-commands=
-    poetry install
-    flake8 pytile
-    pydocstyle pytile
-    pylint pytile
-
-[testenv:typing]
-whitelist_externals=
-    mypy
-    poetry
-commands=
-    poetry install
-    mypy --ignore-missing-imports pytile
-"""
 
 [build-system]
 requires = ["setuptools >= 35.0.2", "wheel >= 0.29.0", "poetry>=0.12"]
