@@ -68,3 +68,17 @@ jobs:
       - uses: codecov/codecov-action@v1.0.3
         with:
           token: ${{secrets.CODECOV_TOKEN}}
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.x"
+          architecture: x64
+      - run: |
+          pip install poetry
+          poetry install
+      - run: |
+          poetry run bandit -r --configfile=.bandit.yaml pytile/
