@@ -1,5 +1,4 @@
 """Define tests for the client object."""
-# pylint: disable=redefined-outer-name,unused-import
 import json
 import re
 
@@ -9,20 +8,25 @@ import pytest
 from pytile import async_login
 from pytile.errors import RequestError
 
-from .const import TILE_CLIENT_UUID, TILE_EMAIL, TILE_PASSWORD, TILE_USER_UUID
-from .fixtures import *  # noqa
+from .common import (
+    TILE_CLIENT_UUID,
+    TILE_EMAIL,
+    TILE_PASSWORD,
+    TILE_USER_UUID,
+    load_fixture,
+)
 
 
 @pytest.mark.asyncio
-async def test_bad_endpoint(
-    aresponses, event_loop, fixture_create_client, fixture_create_session
-):
+async def test_bad_endpoint(aresponses, fixture_create_session):
     """Test that an exception is raised on a bad endpoint."""
     aresponses.add(
         "production.tile-api.com",
         f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
-        aresponses.Response(text=json.dumps(fixture_create_client), status=200),
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"), status=200
+        ),
     )
     aresponses.add(
         "production.tile-api.com",
@@ -38,7 +42,7 @@ async def test_bad_endpoint(
     )
 
     with pytest.raises(RequestError):
-        async with aiohttp.ClientSession(loop=event_loop) as websession:
+        async with aiohttp.ClientSession() as websession:
             client = await async_login(
                 TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
             )
@@ -46,9 +50,7 @@ async def test_bad_endpoint(
 
 
 @pytest.mark.asyncio
-async def test_login(
-    aresponses, event_loop, fixture_create_client, fixture_create_session
-):
+async def test_login(aresponses, fixture_create_session):
     """Test initializing a client with a Tile session."""
     client_pattern = re.compile(r"/api/v1/clients/.+")
     session_pattern = re.compile(r"/api/v1/clients/.+/sessions")
@@ -57,7 +59,9 @@ async def test_login(
         "production.tile-api.com",
         client_pattern,
         "put",
-        aresponses.Response(text=json.dumps(fixture_create_client), status=200),
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"), status=200
+        ),
     )
     aresponses.add(
         "production.tile-api.com",
@@ -66,7 +70,7 @@ async def test_login(
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
 
-    async with aiohttp.ClientSession(loop=event_loop) as websession:
+    async with aiohttp.ClientSession() as websession:
         client = await async_login(TILE_EMAIL, TILE_PASSWORD, websession)
         assert isinstance(client.client_uuid, str)
         assert client.client_uuid != TILE_CLIENT_UUID
@@ -74,15 +78,15 @@ async def test_login(
 
 
 @pytest.mark.asyncio
-async def test_login_existing(
-    aresponses, event_loop, fixture_create_client, fixture_create_session
-):
+async def test_login_existing(aresponses, fixture_create_session):
     """Test the creation of a client with an existing client UUID."""
     aresponses.add(
         "production.tile-api.com",
         f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
-        aresponses.Response(text=json.dumps(fixture_create_client), status=200),
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"), status=200
+        ),
     )
     aresponses.add(
         "production.tile-api.com",
@@ -91,7 +95,7 @@ async def test_login_existing(
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
 
-    async with aiohttp.ClientSession(loop=event_loop) as websession:
+    async with aiohttp.ClientSession() as websession:
         client = await async_login(
             TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
         )
