@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "revision": 1,
+  "timestamp": "2018-06-19T23:03:32.873Z",
+  "timestamp_ms": 1529449412873,
+  "result_code": 0,
+  "result": {
+    "locale": "en-US",
+    "client_uuid": "2cc56adc-b96a-4293-9b94-eda716e0aa17",
+    "app_id": "ios-tile-production",
+    "app_version": "2.31.0",
+    "os_name": null,
+    "os_release": null,
+    "model": null,
+    "signed_in_user_uuid": null,
+    "registration_timestamp": 1529449412870,
+    "user_device_name": null,
+    "beta_option": false,
+    "last_modified_timestamp": 1529449412870
+  }
+}
