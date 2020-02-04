@@ -18,6 +18,14 @@ repos:
           - --quiet
         language_version: python3
         files: ^((pytile|tests)/.+)?[^/]+\.py$
+  - repo: https://github.com/codespell-project/codespell
+    rev: v1.16.0
+    hooks:
+      - id: codespell
+        args:
+          - --skip="./.*,*.json"
+          - --quiet-level=2
+        exclude_types: [json]
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.7.9
     hooks:
