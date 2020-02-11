@@ -46,7 +46,7 @@ jobs:
           venv/bin/py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
       - uses: codecov/codecov-action@v1.0.3
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest

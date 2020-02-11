@@ -9,7 +9,3 @@ init:
 	.venv/bin/poetry lock
 	.venv/bin/poetry install
 	.venv/bin/pre-commit install
-publish:
-	.venv/bin/poetry build
-	.venv/bin/poetry publish
-	rm -rf dist/ build/ .egg *.egg-info/
