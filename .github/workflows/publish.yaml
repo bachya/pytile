@@ -1,5 +1,5 @@
 ---
-name: "Create Release"
+name: "Publish to PyPI"
 
 on:
   push:
@@ -7,23 +7,6 @@ on:
       - "*"
 
 jobs:
-  create_release:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: true
-
   publish_to_pypi:
 
     runs-on: ubuntu-latest
