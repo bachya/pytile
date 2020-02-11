@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+# Run pytest with coverage:
+py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests

@@ -1,0 +1,46 @@
+#!/bin/sh
+set -e
+
+if [ -z "$1" ]; then
+    echo "Usage: script/release [patch | minor | major]"
+    exit 1
+fi
+
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "dev" ]; then
+    echo "Refusing to publish a release from a branch other than dev"
+    exit 1
+fi
+
+if [ -z "$(command -v poetry)" ]; then
+    echo "Poetry needs to be installed to run this script: pip3 install poetry"
+    exit 1
+fi
+
+case "$1" in
+    patch)
+        poetry version patch
+        ;;
+    minor)
+        poetry version minor
+        ;;
+    major)
+        poetry version major
+        ;;
+    *)
+        echo "Unknown release action: \"$1\""
+        exit 1
+        ;;
+esac
+
+# Get the new version, commit, tag, and push:
+new_version="$(poetry version | awk -F' ' '{ print $2 }')"
+git add pyproject.toml
+git commit -m "Bump version to $new_version"
+git tag "$new_version"
+git push && git push --tags
+
+# Merge dev into master:
+git checkout master
+git merge dev
+git push
+git checkout dev
