@@ -125,10 +125,12 @@ asyncio.get_event_loop().run_until_complete(main())
 1. [Check for open features/bugs](https://github.com/bachya/pytile/issues)
   or [initiate a discussion on one](https://github.com/bachya/pytile/issues/new).
 2. [Fork the repository](https://github.com/bachya/pytile/fork).
-3. Install the dev environment: `make init`.
-4. Enter the virtual environment: `source .venv/bin/activate`
-5. Code your new feature or bug fix.
-6. Write a test that covers your new functionality.
-7. Run tests and ensure 100% code coverage: `make coverage`
-8. Add yourself to `AUTHORS.md`.
-9. Submit a pull request!
+3. (_optional, but highly recommended_) Create a virtual environment: `python3 -m venv .venv`
+4. (_optional, but highly recommended_) Enter the virtual environment: `source ./venv/bin/activate`
+5. Install the dev environment: `script/setup`
+6. Code your new feature or bug fix.
+7. Write tests that cover your new functionality.
+8. Run tests and ensure 100% code coverage: `script/test`
+9. Update `README.md` with any new documentation.
+10. Add yourself to `AUTHORS.md`.
+11. Submit a pull request!
