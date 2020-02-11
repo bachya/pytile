@@ -6,6 +6,7 @@ on:
     branches:
       - dev
       - master
+
   push:
     branches:
       - dev
@@ -13,66 +14,85 @@ on:
 
 jobs:
   test:
+    name: Tests
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version:
           - "3.6"
           - "3.7"
           - "3.8"
+
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
       - uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - name: pytest
-        run: |
+
+      - run: |
           python -m venv venv
           venv/bin/pip install -r requirements_test.txt
-          venv/bin/py.test
+          venv/bin/py.test tests/
 
   coverage:
+
+    name: Test Coverage
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
       - uses: actions/setup-python@v1
         with:
           python-version: "3.x"
           architecture: x64
+
       - run: |
           python -m venv venv
           venv/bin/pip install -r requirements_test.txt
           venv/bin/py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
+
       - uses: codecov/codecov-action@v1.0.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
+
+    name: Linting
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
       - uses: actions/setup-python@v1
         with:
           python-version: "3.x"
           architecture: x64
-      - name: setup
-        run: |
+
+      - run: |
           python -m venv venv
           venv/bin/pip install pre-commit
           venv/bin/pre-commit install-hooks --config .pre-commit-config.yaml
-      - name: bandit
-        run: |
           venv/bin/pre-commit run bandit --all-files
-      - name: black
-        run: |
           venv/bin/pre-commit run black --all-files
-      - name: flake8
-        run: |
           venv/bin/pre-commit run flake8 --all-files
-      - name: isort
-        run: |
           venv/bin/pre-commit run isort --all-files --show-diff-on-failure
-      - name: mypy
-        run: |
           venv/bin/pre-commit run mypy --all-files
+
+  static_analysis:
+
+    name: Static Analysis
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: |
+          shellcheck script/*
