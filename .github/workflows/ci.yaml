@@ -77,11 +77,7 @@ jobs:
 
       - run: |
           python -m venv venv
-          shellcheck script/*
           venv/bin/pip install pre-commit
           venv/bin/pre-commit install-hooks --config .pre-commit-config.yaml
-          venv/bin/pre-commit run bandit --all-files
-          venv/bin/pre-commit run black --all-files
-          venv/bin/pre-commit run flake8 --all-files
-          venv/bin/pre-commit run isort --all-files --show-diff-on-failure
-          venv/bin/pre-commit run mypy --all-files
+          venv/bin/pre-commit run --all-files
+          shellcheck script/*
