@@ -79,5 +79,12 @@ jobs:
           python -m venv venv
           venv/bin/pip install pre-commit
           venv/bin/pre-commit install-hooks --config .pre-commit-config.yaml
-          venv/bin/pre-commit run --all-files
+          venv/bin/pre-commit run bandit --all-files
+          venv/bin/pre-commit run black --all-files
+          venv/bin/pre-commit run check-json --all-files
+          venv/bin/pre-commit run codespell --all-files
+          venv/bin/pre-commit run flake8 --all-files
+          venv/bin/pre-commit run isort --all-files
+          venv/bin/pre-commit run mypy --all-files
+          venv/bin/pre-commit run pydocstyle --all-files
           shellcheck script/*
