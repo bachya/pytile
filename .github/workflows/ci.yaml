@@ -57,7 +57,7 @@ jobs:
           venv/bin/pip install -r requirements_test.txt
           venv/bin/py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
 
-      - uses: codecov/codecov-action@v1.0.3
+      - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
