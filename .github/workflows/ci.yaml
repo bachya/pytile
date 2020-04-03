@@ -55,7 +55,13 @@ jobs:
       - run: |
           python -m venv venv
           venv/bin/pip install -r requirements_test.txt
-          venv/bin/py.test -s --verbose --cov-report term-missing --cov-report xml --cov=pytile tests
+          venv/bin/py.test \
+            -s \
+            --verbose \
+            --cov-report term-missing \
+            --cov-report xml \
+            --cov=pytest tests
+
 
       - uses: codecov/codecov-action@v1
         with:
@@ -75,6 +81,14 @@ jobs:
           python-version: "3.x"
           architecture: x64
 
+      - run: echo "::set-env name=PY::$(python -VV | sha256sum | cut -d' ' -f1)"
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pre-commit
+          key: >
+            pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
       - run: |
           python -m venv venv
           venv/bin/pip install pre-commit
@@ -87,4 +101,4 @@ jobs:
           venv/bin/pre-commit run isort --all-files
           venv/bin/pre-commit run mypy --all-files
           venv/bin/pre-commit run pydocstyle --all-files
-          shellcheck script/*
+          venv/bin/pre-commit run shellcheck --all-files

@@ -59,3 +59,11 @@ repos:
     hooks:
       - id: pydocstyle
         files: ^((pytile|tests)/.+)?[^/]+\.py$
+  - repo: https://github.com/ryanrhee/shellcheck-py
+    rev: v0.7.0.1-1
+    hooks:
+      - id: shellcheck
+        args:
+          - --format=json
+        files: script/*
+
