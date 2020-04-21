@@ -42,9 +42,9 @@ async def test_bad_endpoint(aresponses, fixture_create_session):
     )
 
     with pytest.raises(RequestError):
-        async with aiohttp.ClientSession() as websession:
+        async with aiohttp.ClientSession() as session:
             client = await async_login(
-                TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
+                TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID, session=session
             )
             await client._request("get", "bad_endpoint")
 
@@ -70,8 +70,8 @@ async def test_login(aresponses, fixture_create_session):
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
 
-    async with aiohttp.ClientSession() as websession:
-        client = await async_login(TILE_EMAIL, TILE_PASSWORD, websession)
+    async with aiohttp.ClientSession() as session:
+        client = await async_login(TILE_EMAIL, TILE_PASSWORD, session=session)
         assert isinstance(client.client_uuid, str)
         assert client.client_uuid != TILE_CLIENT_UUID
         assert client.user_uuid == TILE_USER_UUID
@@ -95,8 +95,8 @@ async def test_login_existing(aresponses, fixture_create_session):
         aresponses.Response(text=json.dumps(fixture_create_session), status=200),
     )
 
-    async with aiohttp.ClientSession() as websession:
+    async with aiohttp.ClientSession() as session:
         client = await async_login(
-            TILE_EMAIL, TILE_PASSWORD, websession, client_uuid=TILE_CLIENT_UUID
+            TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID, session=session
         )
         assert client.client_uuid == TILE_CLIENT_UUID

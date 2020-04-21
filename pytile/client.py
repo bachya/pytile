@@ -2,7 +2,8 @@
 from typing import Optional
 from uuid import uuid4
 
-from aiohttp import ClientSession, client_exceptions
+from aiohttp import ClientSession, ClientTimeout
+from aiohttp.client_exceptions import ClientError
 
 from .errors import RequestError, SessionExpiredError
 from .tile import Tile
@@ -12,6 +13,7 @@ API_URL_SCAFFOLD: str = "https://production.tile-api.com/api/v1"
 DEFAULT_APP_ID: str = "ios-tile-production"
 DEFAULT_APP_VERSION: str = "2.55.1.3707"
 DEFAULT_LOCALE: str = "en-US"
+DEFAULT_TIMEOUT: int = 10
 
 
 class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
@@ -21,8 +23,8 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self,
         email: str,
         password: str,
-        websession: ClientSession,
         *,
+        session: Optional[ClientSession] = None,
         client_uuid: Optional[str] = None,
         locale: str = DEFAULT_LOCALE,
     ) -> None:
@@ -31,8 +33,8 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self._email: str = email
         self._locale: str = locale
         self._password: str = password
+        self._session: ClientSession = session
         self._session_expiry: Optional[int] = None
-        self._websession: ClientSession = websession
         self.tiles: Optional[Tile] = None
         self.user_uuid: Optional[str] = None
 
@@ -55,9 +57,8 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         if self._session_expiry and self._session_expiry <= current_epoch_time():
             raise SessionExpiredError("Session has expired; make a new one!")
 
-        if not headers:
-            headers = {}
-        headers.update(
+        _headers = headers or {}
+        _headers.update(
             {
                 "Tile_app_id": DEFAULT_APP_ID,
                 "Tile_app_version": DEFAULT_APP_VERSION,
@@ -65,20 +66,30 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
             }
         )
 
-        async with self._websession.request(
-            method,
-            f"{API_URL_SCAFFOLD}/{endpoint}",
-            headers=headers,
-            params=params,
-            data=data,
-        ) as resp:
-            try:
+        use_running_session = self._session and not self._session.closed
+
+        if use_running_session:
+            session = self._session
+        else:
+            session = ClientSession(timeout=ClientTimeout(total=DEFAULT_TIMEOUT))
+
+        try:
+            async with session.request(
+                method,
+                f"{API_URL_SCAFFOLD}/{endpoint}",
+                headers=_headers,
+                params=params,
+                data=data,
+            ) as resp:
                 resp.raise_for_status()
                 return await resp.json(content_type=None)
-            except client_exceptions.ClientError as err:
-                raise RequestError(
-                    f"Error requesting data from {endpoint}: {err}"
-                ) from None
+        except ClientError as err:
+            raise RequestError(
+                f"Error requesting data from {endpoint}: {err}"
+            ) from None
+        finally:
+            if not use_running_session:
+                await session.close()
 
     async def async_init(self) -> None:
         """Create a Tile session."""
@@ -110,12 +121,14 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 async def async_login(
     email: str,
     password: str,
-    websession: ClientSession,
     *,
     client_uuid: Optional[str] = None,
     locale: str = DEFAULT_LOCALE,
+    session: Optional[ClientSession] = None,
 ) -> Client:
     """Return an authenticated client."""
-    client = Client(email, password, websession, client_uuid=client_uuid, locale=locale)
+    client = Client(
+        email, password, client_uuid=client_uuid, locale=locale, session=session
+    )
     await client.async_init()
     return client

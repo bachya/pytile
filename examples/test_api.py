@@ -9,10 +9,10 @@ from pytile.errors import TileError
 
 async def main():
     """Run."""
-    async with ClientSession() as websession:
+    async with ClientSession() as session:
         try:
             # Create a client:
-            client = await async_login("<EMAIL>", "<PASSWORD>", websession)
+            client = await async_login("<EMAIL>", "<PASSWORD>", session=session)
 
             print("Showing active Tiles:")
             print(await client.tiles.all())
@@ -23,4 +23,4 @@ async def main():
             print(err)
 
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())

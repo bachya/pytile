@@ -15,6 +15,11 @@ location and more).
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
 
+- [Python Versions](#python-versions)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+
 # Python Versions
 
 `pytile` is currently supported on:
@@ -31,48 +36,30 @@ pip install pytile
 
 # Usage
 
-`pytile` starts within an
-[aiohttp](https://aiohttp.readthedocs.io/en/stable/) `ClientSession`:
-
-
 ```python
 import asyncio
 
 from aiohttp import ClientSession
 
-from pytile import Client
+from pytile import async_login
 
 
 async def main() -> None:
-    """Create the aiohttp session and run the example."""
-    async with ClientSession() as websession:
-        # YOUR CODE HERE
+    """Run!"""
+    client = await async_login("<EMAIL>", "<PASSWORD>")
+
+    # Get all Tiles associated with an account:
+    await client.tiles.all()
 
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
 ```
 
-If you receive SSL errors, use `ClientSession(connector=TCPConnector(verify_ssl=False))`
-instead:
-
-```python
-import asyncio
-
-from aiohttp import ClientSession, TCPConnector
-
-from pytile import Client
-
-
-async def main() -> None:
-    """Create the aiohttp session and run the example."""
-    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as websession:
-        # YOUR CODE HERE
-
-
-asyncio.get_event_loop().run_until_complete(main())
-```
-
-Create a client, initialize it, and get to work:
+By default, the library creates a new connection to Tile with each coroutine. If you are
+calling a large number of coroutines (or merely want to squeeze out every second of
+runtime savings possible), an
+[`aiohttp`](https://github.com/aio-libs/aiohttp) `ClientSession` can be used for connection
+pooling:
 
 ```python
 import asyncio
@@ -83,15 +70,15 @@ from pytile import async_login
 
 
 async def main() -> None:
-    """Create the aiohttp session and run the example."""
-    async with ClientSession() as websession:
-        client = await async_login("<EMAIL>", "<PASSWORD>", websession)
+    """Run!"""
+    async with ClientSession() as session:
+        client = await async_login("<EMAIL>", "<PASSWORD>", session)
 
         # Get all Tiles associated with an account:
         await client.tiles.all()
 
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
 ```
 
 If for some reason you need to use a specific client UUID (to, say, ensure that the
@@ -107,17 +94,16 @@ from pytile import async_login
 
 
 async def main() -> None:
-    """Create the aiohttp session and run the example."""
-    async with ClientSession() as websession:
-        client = await async_login(
-            "<EMAIL>", "<PASSWORD>", websession, client_uuid="MY_UUID", locale="en-GB"
-        )
+    """Run!"""
+    client = await async_login(
+        "<EMAIL>", "<PASSWORD>", client_uuid="MY_UUID", locale="en-GB"
+    )
 
-        # Get all Tiles associated with an account:
-        await client.tiles.all()
+    # Get all Tiles associated with an account:
+    await client.tiles.all()
 
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
 ```
 
 # Contributing
@@ -126,7 +112,7 @@ asyncio.get_event_loop().run_until_complete(main())
   or [initiate a discussion on one](https://github.com/bachya/pytile/issues/new).
 2. [Fork the repository](https://github.com/bachya/pytile/fork).
 3. (_optional, but highly recommended_) Create a virtual environment: `python3 -m venv .venv`
-4. (_optional, but highly recommended_) Enter the virtual environment: `source ./venv/bin/activate`
+4. (_optional, but highly recommended_) Enter the virtual environment: `source ./.venv/bin/activate`
 5. Install the dev environment: `script/setup`
 6. Code your new feature or bug fix.
 7. Write tests that cover your new functionality.
