@@ -15,6 +15,11 @@ location and more).
 This library is built on an unpublished, unofficial Tile API; it may alter or
 cease operation at any point.
 
+- [Python Versions](#python-versions)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+
 # Python Versions
 
 `pytile` is currently supported on:
