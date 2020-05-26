@@ -39,6 +39,7 @@ classifiers = [
 [tool.poetry.dependencies]
 aiohttp = "^3.6.2"
 python = "^3.6.0"
+pylint = "^2.5.2"
 
 [tool.poetry.dev-dependencies]
 aresponses = "^2.0.0"
