@@ -32,6 +32,9 @@ case "$1" in
         ;;
 esac
 
+# Temporarily uninstall pre-commit hooks so that we can push to dev and master:
+pre-commit uninstall
+
 # Get the new version, commit, tag, and push:
 new_version="$(poetry version | awk -F' ' '{ print $2 }')"
 git add pyproject.toml
@@ -44,3 +47,6 @@ git checkout master
 git merge dev
 git push
 git checkout dev
+
+# Re-initialize pre-commit:
+pre-commit install
