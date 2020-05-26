@@ -12,6 +12,7 @@ from .common import (
     TILE_EMAIL,
     TILE_PASSWORD,
     TILE_TILE_NAME,
+    TILE_TILE_UUID,
     TILE_USER_UUID,
     load_fixture,
 )
@@ -82,7 +83,8 @@ async def test_get_all(
             TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID, session=session
         )
         tiles = await client.tiles.all()
-        assert tiles[0]["name"] == TILE_TILE_NAME
+        assert len(tiles) == 1
+        assert tiles[TILE_TILE_UUID]["name"] == TILE_TILE_NAME
 
 
 @pytest.mark.asyncio
@@ -121,4 +123,5 @@ async def test_get_all_no_explicit_session(
 
     client = await async_login(TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID)
     tiles = await client.tiles.all()
-    assert tiles[0]["name"] == TILE_TILE_NAME
+    assert len(tiles) == 1
+    assert tiles[TILE_TILE_UUID]["name"] == TILE_TILE_NAME
