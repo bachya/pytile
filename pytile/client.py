@@ -93,6 +93,10 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 
     async def async_init(self) -> None:
         """Create a Tile session."""
+        # Invalidate the existing session expiry datetime (if it exists) so that the
+        # next few requests don't fail:
+        self._session_expiry = None
+
         if not self._client_established:
             await self._request(
                 "put",

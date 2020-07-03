@@ -12,7 +12,7 @@ async def main():
     async with ClientSession() as session:
         try:
             # Create a client:
-            client = await async_login("<EMAIL>", "<PASSWORD>", session=session)
+            client = await async_login("bachya1208@gmail.com", "ENVHPT8ywivMy)uFzmBg#qqpz", session=session)
 
             print("Showing active Tiles:")
             print(await client.tiles.all())
