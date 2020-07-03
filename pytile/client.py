@@ -39,10 +39,7 @@ class Client:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self.user_uuid: Optional[str] = None
 
         self.client_uuid: str
-        if not client_uuid:
-            self.client_uuid = str(uuid4())
-        else:
-            self.client_uuid = client_uuid
+        self.client_uuid = str(uuid4()) if not client_uuid else client_uuid
 
     async def _request(
         self,
