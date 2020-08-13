@@ -20,14 +20,16 @@ async def main():
             print(f"Tile Count: {len(tiles)}")
             print()
 
-            for tile in tiles.values():
-                print(f"UUID: {tile.uuid}")
-                print(f"Name: {tile.name}")
-                print(f"Type: {tile.kind}")
-                print(f"Latitude: {tile.latitude}")
-                print(f"Longitude: {tile.longitude}")
-                print(f"Last Timestamp: {tile.last_timestamp}")
-                print()
+            tile = tiles["7a60a79e818b1404"]
+            await tile.async_set_name("Aaron's Wallet 2")
+            # for tile in tiles.values():
+            #     print(f"UUID: {tile.uuid}")
+            #     print(f"Name: {tile.name}")
+            #     print(f"Type: {tile.kind}")
+            #     print(f"Latitude: {tile.latitude}")
+            #     print(f"Longitude: {tile.longitude}")
+            #     print(f"Last Timestamp: {tile.last_timestamp}")
+            #     print()
         except TileError as err:
             print(err)
 

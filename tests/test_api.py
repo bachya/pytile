@@ -18,7 +18,7 @@ from .common import (
 
 
 @pytest.mark.asyncio
-async def test_bad_endpoint(aresponses, fixture_create_session):
+async def test_bad_endpoint(aresponses, create_session_response):
     """Test that an exception is raised on a bad endpoint."""
     aresponses.add(
         "production.tile-api.com",
@@ -32,7 +32,11 @@ async def test_bad_endpoint(aresponses, fixture_create_session):
         "production.tile-api.com",
         f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
         "post",
-        aresponses.Response(text=json.dumps(fixture_create_session), status=200),
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
     )
     aresponses.add(
         "production.tile-api.com",
@@ -43,14 +47,14 @@ async def test_bad_endpoint(aresponses, fixture_create_session):
 
     with pytest.raises(RequestError):
         async with aiohttp.ClientSession() as session:
-            client = await async_login(
-                TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID, session=session
+            api = await async_login(
+                TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
             )
-            await client._request("get", "bad_endpoint")
+            await api.request("get", "bad_endpoint")
 
 
 @pytest.mark.asyncio
-async def test_login(aresponses, fixture_create_session):
+async def test_login(aresponses, create_session_response):
     """Test initializing a client with a Tile session."""
     client_pattern = re.compile(r"/api/v1/clients/.+")
     session_pattern = re.compile(r"/api/v1/clients/.+/sessions")
@@ -60,43 +64,55 @@ async def test_login(aresponses, fixture_create_session):
         client_pattern,
         "put",
         aresponses.Response(
-            text=load_fixture("create_client_response.json"), status=200
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
         ),
     )
     aresponses.add(
         "production.tile-api.com",
         session_pattern,
         "post",
-        aresponses.Response(text=json.dumps(fixture_create_session), status=200),
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
     )
 
     async with aiohttp.ClientSession() as session:
-        client = await async_login(TILE_EMAIL, TILE_PASSWORD, session=session)
-        assert isinstance(client.client_uuid, str)
-        assert client.client_uuid != TILE_CLIENT_UUID
-        assert client.user_uuid == TILE_USER_UUID
+        api = await async_login(TILE_EMAIL, TILE_PASSWORD, session)
+        assert isinstance(api.client_uuid, str)
+        assert api.client_uuid != TILE_CLIENT_UUID
+        assert api.user_uuid == TILE_USER_UUID
 
 
 @pytest.mark.asyncio
-async def test_login_existing(aresponses, fixture_create_session):
+async def test_login_existing(aresponses, create_session_response):
     """Test the creation of a client with an existing client UUID."""
     aresponses.add(
         "production.tile-api.com",
         f"/api/v1/clients/{TILE_CLIENT_UUID}",
         "put",
         aresponses.Response(
-            text=load_fixture("create_client_response.json"), status=200
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
         ),
     )
     aresponses.add(
         "production.tile-api.com",
         f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
         "post",
-        aresponses.Response(text=json.dumps(fixture_create_session), status=200),
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
     )
 
     async with aiohttp.ClientSession() as session:
-        client = await async_login(
-            TILE_EMAIL, TILE_PASSWORD, client_uuid=TILE_CLIENT_UUID, session=session
+        api = await async_login(
+            TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
         )
-        assert client.client_uuid == TILE_CLIENT_UUID
+        assert api.client_uuid == TILE_CLIENT_UUID

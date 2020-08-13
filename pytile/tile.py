@@ -2,8 +2,6 @@
 from datetime import datetime
 from typing import Awaitable, Callable
 
-from aiohttp import FormData
-
 TASK_DETAILS = "details"
 TASK_MEASUREMENTS = "measurements"
 
@@ -17,16 +15,16 @@ class Tile:
         """Initialize."""
         self._async_request = async_request
         self._last_timestamp: datetime = datetime.fromtimestamp(
-            round(tile_data["last_tile_state"]["timestamp"] / 1000)
+            tile_data["last_tile_state"]["timestamp"] / 1000
         )
         self._lost_timestamp: datetime = datetime.fromtimestamp(
-            round(tile_data["last_tile_state"]["lost_timestamp"] / 1000)
+            tile_data["last_tile_state"]["lost_timestamp"] / 1000
         )
         self._tile_data = tile_data
 
     def __str__(self) -> str:
         """Return the string representation of the Tile."""
-        return f"<Tile uuid={self.uuid} name={self.name}"
+        return f"<Tile uuid={self.uuid} name={self.name}>"
 
     @property
     def accuracy(self) -> float:
@@ -103,15 +101,17 @@ class Tile:
         """Return whether the Tile is visible."""
         return self._tile_data["visible"]
 
-    async def async_set_name(self, name: str) -> None:
-        """Set the Tile's name."""
-        data = FormData({"name": name, "archetype": self.archetype}, charset="utf-8")
-        await self._async_request("put", f"tiles/{self.uuid}/attributes", data=data)
-        await self.async_update()
+    def _async_save_new_data(self, data: dict) -> None:
+        """Save new Tile data in this object."""
+        self._last_timestamp = datetime.fromtimestamp(
+            data["result"]["last_tile_state"]["timestamp"] / 1000
+        )
+        self._lost_timestamp = datetime.fromtimestamp(
+            data["result"]["last_tile_state"]["lost_timestamp"] / 1000
+        )
+        self._tile_data = data["result"]
 
     async def async_update(self) -> None:
         """Get the latest measurements from the Tile."""
         data = await self._async_request("get", f"tiles/{self.uuid}")
-        self._last_timestamp = data["last_tile_state"]["timestamp"]
-        self._lost_timestamp = data["last_tile_state"]["lost_timestamp"]
-        self._tile_data = data
+        self._async_save_new_data(data)
