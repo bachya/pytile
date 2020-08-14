@@ -1,6 +1,7 @@
 """Define tests for the client object."""
 import json
 import re
+from time import time
 
 import aiohttp
 import pytest
@@ -12,6 +13,7 @@ from .common import (
     TILE_CLIENT_UUID,
     TILE_EMAIL,
     TILE_PASSWORD,
+    TILE_TILE_UUID,
     TILE_USER_UUID,
     load_fixture,
 )
@@ -51,6 +53,83 @@ async def test_bad_endpoint(aresponses, create_session_response):
                 TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
             )
             await api.request("get", "bad_endpoint")
+
+
+@pytest.mark.asyncio
+async def test_expired_session(
+    aresponses, create_session_response, expired_session_response
+):
+    """Test that an expired session is recreated automatically."""
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
+        "put",
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
+        "post",
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
+        "put",
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
+        "post",
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        "/api/v1/tiles/tile_states",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_states_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/tiles/{TILE_TILE_UUID}",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_details_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+
+    async with aiohttp.ClientSession() as session:
+        api = await async_login(
+            TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+        )
+
+        # Simulate an expired session:
+        api._session_expiry = int(time() * 1000) - 1000000
+
+        tiles = await api.async_get_tiles()
 
 
 @pytest.mark.asyncio
