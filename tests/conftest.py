@@ -1,13 +1,14 @@
 """Define fixtures, constants, etc. available for all tests."""
+import json
 from time import time
 
 import pytest
 
-from .common import TILE_CLIENT_UUID, TILE_EMAIL, TILE_USER_UUID
+from .common import TILE_CLIENT_UUID, TILE_EMAIL, TILE_USER_UUID, load_fixture
 
 
 @pytest.fixture()
-def fixture_create_session():
+def create_session_response():
     """Return a /clients/<UUID>/sessions response."""
     return {
         "version": 1,
@@ -40,7 +41,7 @@ def fixture_create_session():
 
 
 @pytest.fixture()
-def fixture_expired_session():
+def expired_session_response():
     """Return a /clients/<UUID>/sessions response with an expired session."""
     return {
         "version": 1,
@@ -70,3 +71,22 @@ def fixture_expired_session():
             "changes": "EXISTING_ACCOUNT",
         },
     }
+
+
+@pytest.fixture()
+def tile_details_new_name_response():
+    """Define a fixture for a subscription with an ALARM alarm state."""
+    raw = load_fixture("tile_details_response.json")
+    data = json.loads(raw)
+    data["result"]["name"] = "New Name"
+    return json.dumps(data)
+
+
+@pytest.fixture()
+def tile_details_update_response():
+    """Define a fixture for a subscription with an ALARM alarm state."""
+    raw = load_fixture("tile_details_response.json")
+    data = json.loads(raw)
+    data["result"]["last_tile_state"]["latitude"] = 51.8943631
+    data["result"]["last_tile_state"]["longitude"] = -0.4930538
+    return json.dumps(data)

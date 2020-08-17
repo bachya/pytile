@@ -20,6 +20,11 @@ cease operation at any point.
 - [Usage](#usage)
 - [Contributing](#contributing)
 
+# NOTE: Version 5.0.0
+
+Version 5.0.0 is a complete re-architecture of `pytile` – as such, the API has changed.
+Please read the documentation carefully!
+
 # Python Versions
 
 `pytile` is currently supported on:
@@ -36,30 +41,10 @@ pip install pytile
 
 # Usage
 
-```python
-import asyncio
+## Getting an API Object
 
-from aiohttp import ClientSession
-
-from pytile import async_login
-
-
-async def main() -> None:
-    """Run!"""
-    client = await async_login("<EMAIL>", "<PASSWORD>")
-
-    # Get all Tiles associated with an account:
-    await client.tiles.all()
-
-
-asyncio.run(main())
-```
-
-By default, the library creates a new connection to Tile with each coroutine. If you are
-calling a large number of coroutines (or merely want to squeeze out every second of
-runtime savings possible), an
-[`aiohttp`](https://github.com/aio-libs/aiohttp) `ClientSession` can be used for connection
-pooling:
+`pytile` usage starts with an [`aiohttp`](https://github.com/aio-libs/aiohttp) `ClientSession` –
+note that this ClientSession is required to properly authenticate the library:
 
 ```python
 import asyncio
@@ -72,10 +57,7 @@ from pytile import async_login
 async def main() -> None:
     """Run!"""
     async with ClientSession() as session:
-        client = await async_login("<EMAIL>", "<PASSWORD>", session)
-
-        # Get all Tiles associated with an account:
-        await client.tiles.all()
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
 
 
 asyncio.run(main())
@@ -95,12 +77,102 @@ from pytile import async_login
 
 async def main() -> None:
     """Run!"""
-    client = await async_login(
-        "<EMAIL>", "<PASSWORD>", client_uuid="MY_UUID", locale="en-GB"
-    )
+    async with ClientSession() as session:
+        api = await async_login(
+            "<EMAIL>", "<PASSWORD>", session, client_uuid="MY_UUID", locale="en-GB"
+        )
 
-    # Get all Tiles associated with an account:
-    await client.tiles.all()
+
+asyncio.run(main())
+```
+
+## Getting Tiles
+
+```python
+import asyncio
+
+from aiohttp import ClientSession
+
+from pytile import async_login
+
+
+async def main() -> None:
+    """Run!"""
+    async with ClientSession() as session:
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+
+        tiles = await api.async_get_tiles()
+
+
+asyncio.run(main())
+```
+
+The `async_get_tiles` coroutine returns a dict with Tile UUIDs as the keys and `Tile`
+objects as the values.
+
+### The `Tile` Object
+
+The Tile object comes with several properties:
+
+* `accuracy`: the location accuracy of the Tile
+* `altitude`: the altitude of the Tile
+* `archetype`: the internal reference string that describes the Tile's "family"
+* `dead`: whether the Tile is inactive
+* `firmware_version`: the Tile's firmware version
+* `hardware_version`: the Tile's hardware version
+* `kind`: the kind of Tile (e.g., `TILE`, `PHONE`)
+* `last_timestamp`: the timestamp at which the current attributes were received
+* `latitude`: the latitude of the Tile
+* `longitude`: the latitude of the Tile
+* `lost`: whether the Tile has been marked as "lost"
+* `lost_timestamp`: the timestamp at which the Tile was last marked as "lost"
+* `name`: the name of the Tile
+* `uuid`: the Tile UUID
+* `visible`: whether the Tile is visible in the mobile app
+
+```python
+import asyncio
+
+from aiohttp import ClientSession
+
+from pytile import async_login
+
+
+async def main() -> None:
+    """Run!"""
+    async with ClientSession() as session:
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+
+        tiles = await api.async_get_tiles()
+
+        for tile_uuid, tile in tiles.items():
+            print(f"The Tile's name is {tile.name}")
+            # ...
+
+
+asyncio.run(main())
+```
+
+In addition to these properties, the `Tile` object comes with an `async_update` coroutine
+which requests new data from the Tile cloud API for this Tile:
+
+```python
+import asyncio
+
+from aiohttp import ClientSession
+
+from pytile import async_login
+
+
+async def main() -> None:
+    """Run!"""
+    async with ClientSession() as session:
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+
+        tiles = await api.async_get_tiles()
+
+        for tile_uuid, tile in tiles.items():
+            await tile.async_update()
 
 
 asyncio.run(main())

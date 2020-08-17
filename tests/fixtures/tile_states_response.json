@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "revision": 1,
+  "timestamp": "2020-08-12T21:46:38.993Z",
+  "timestamp_ms": 1597268798993,
+  "result_code": 0,
+  "result": [
+    {
+      "location": {
+        "latitude": 51.528308,
+        "longitude": -0.3817765,
+        "location_timestamp": 1512615215149,
+        "horizontal_accuracy": 5,
+        "client_name": null
+      },
+      "tile_id": "19264d2dffdbca32",
+      "mark_as_lost": {
+        "timestamp": -1,
+        "is_lost": false
+      }
+    }
+  ]
+}
