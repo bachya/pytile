@@ -14,10 +14,10 @@ class Tile:
     ) -> None:
         """Initialize."""
         self._async_request = async_request
-        self._last_timestamp: datetime = datetime.fromtimestamp(
+        self._last_timestamp: datetime = datetime.utcfromtimestamp(
             tile_data["last_tile_state"]["timestamp"] / 1000
         )
-        self._lost_timestamp: datetime = datetime.fromtimestamp(
+        self._lost_timestamp: datetime = datetime.utcfromtimestamp(
             tile_data["last_tile_state"]["lost_timestamp"] / 1000
         )
         self._tile_data = tile_data
@@ -103,10 +103,10 @@ class Tile:
 
     def _async_save_new_data(self, data: dict) -> None:
         """Save new Tile data in this object."""
-        self._last_timestamp = datetime.fromtimestamp(
+        self._last_timestamp = datetime.utcfromtimestamp(
             data["result"]["last_tile_state"]["timestamp"] / 1000
         )
-        self._lost_timestamp = datetime.fromtimestamp(
+        self._lost_timestamp = datetime.utcfromtimestamp(
             data["result"]["last_tile_state"]["lost_timestamp"] / 1000
         )
         self._tile_data = data["result"]
