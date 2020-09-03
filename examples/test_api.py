@@ -6,8 +6,8 @@ from aiohttp import ClientSession
 from pytile import async_login
 from pytile.errors import TileError
 
-TILE_EMAIL = "bachya1208@gmail.com"
-TILE_PASSWORD = "}oeoGpGpVFh8VTFhKDzi"
+TILE_EMAIL = "<EMAIL>"
+TILE_PASSWORD = "<PASSWORD>"
 
 
 async def main():
@@ -18,18 +18,14 @@ async def main():
 
             tiles = await api.async_get_tiles()
             print(f"Tile Count: {len(tiles)}")
-            print()
-
-            tile = tiles["7a60a79e818b1404"]
-            await tile.async_set_name("Aaron's Wallet 2")
-            # for tile in tiles.values():
-            #     print(f"UUID: {tile.uuid}")
-            #     print(f"Name: {tile.name}")
-            #     print(f"Type: {tile.kind}")
-            #     print(f"Latitude: {tile.latitude}")
-            #     print(f"Longitude: {tile.longitude}")
-            #     print(f"Last Timestamp: {tile.last_timestamp}")
-            #     print()
+            for tile in tiles.values():
+                print(f"UUID: {tile.uuid}")
+                print(f"Name: {tile.name}")
+                print(f"Type: {tile.kind}")
+                print(f"Latitude: {tile.latitude}")
+                print(f"Longitude: {tile.longitude}")
+                print(f"Last Timestamp: {tile.last_timestamp}")
+                print()
         except TileError as err:
             print(err)
 
