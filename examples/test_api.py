@@ -1,10 +1,13 @@
 """Run an example script to quickly test."""
 import asyncio
+import logging
 
 from aiohttp import ClientSession
 
 from pytile import async_login
 from pytile.errors import TileError
+
+_LOGGER = logging.getLogger(__name__)
 
 TILE_EMAIL = "<EMAIL>"
 TILE_PASSWORD = "<PASSWORD>"
@@ -12,22 +15,22 @@ TILE_PASSWORD = "<PASSWORD>"
 
 async def main():
     """Run."""
+    logging.basicConfig(level=logging.INFO)
     async with ClientSession() as session:
         try:
             api = await async_login(TILE_EMAIL, TILE_PASSWORD, session)
 
             tiles = await api.async_get_tiles()
-            print(f"Tile Count: {len(tiles)}")
+            _LOGGER.info("Tile Count: %s", len(tiles))
             for tile in tiles.values():
-                print(f"UUID: {tile.uuid}")
-                print(f"Name: {tile.name}")
-                print(f"Type: {tile.kind}")
-                print(f"Latitude: {tile.latitude}")
-                print(f"Longitude: {tile.longitude}")
-                print(f"Last Timestamp: {tile.last_timestamp}")
-                print()
+                _LOGGER.info("UUID: %s", tile.uuid)
+                _LOGGER.info("Name: %s", tile.name)
+                _LOGGER.info("Type: %s", tile.kind)
+                _LOGGER.info("Latitude: %s", tile.latitude)
+                _LOGGER.info("Longitude: %s", tile.longitude)
+                _LOGGER.info("Last Timestamp: %s", tile.last_timestamp)
         except TileError as err:
-            print(err)
+            _LOGGER.info(err)
 
 
 asyncio.run(main())
