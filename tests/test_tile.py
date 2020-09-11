@@ -89,6 +89,79 @@ async def test_get_tiles(aresponses, create_session_response):
 
 
 @pytest.mark.asyncio
+async def test_missing_last_tile_state(aresponses, create_session_response):
+    """Test that a missing last_tile_state is handled correctly."""
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
+        "put",
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
+        "post",
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        "/api/v1/tiles/tile_states",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_states_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/tiles/{TILE_TILE_UUID}",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_details_missing_last_state_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/tiles/{TILE_TILE_UUID}",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_details_missing_last_state_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+
+    async with aiohttp.ClientSession() as session:
+        api = await async_login(
+            TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+        )
+        tiles = await api.async_get_tiles()
+        tile = tiles[TILE_TILE_UUID]
+        assert not tile.accuracy
+        assert not tile.altitude
+        assert not tile.last_timestamp
+        assert not tile.latitude
+        assert not tile.longitude
+        assert not tile.lost
+        assert not tile.lost_timestamp
+
+        await tile.async_update()
+        assert not tile.latitude
+        assert not tile.longitude
+
+
+@pytest.mark.asyncio
 async def test_tile_update(
     aresponses, create_session_response, tile_details_update_response
 ):
