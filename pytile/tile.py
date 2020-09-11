@@ -1,6 +1,9 @@
 """Define a Tile object."""
 from datetime import datetime
-from typing import Awaitable, Callable
+import logging
+from typing import Awaitable, Callable, Optional
+
+_LOGGER = logging.getLogger(__name__)
 
 TASK_DETAILS = "details"
 TASK_MEASUREMENTS = "measurements"
@@ -14,27 +17,41 @@ class Tile:
     ) -> None:
         """Initialize."""
         self._async_request = async_request
-        self._last_timestamp: datetime = datetime.utcfromtimestamp(
-            tile_data["last_tile_state"]["timestamp"] / 1000
-        )
-        self._lost_timestamp: datetime = datetime.utcfromtimestamp(
-            tile_data["last_tile_state"]["lost_timestamp"] / 1000
-        )
         self._tile_data = tile_data
+
+        try:
+            self._last_timestamp: Optional[datetime] = datetime.utcfromtimestamp(
+                tile_data["last_tile_state"]["timestamp"] / 1000
+            )
+            self._lost_timestamp: Optional[datetime] = datetime.utcfromtimestamp(
+                tile_data["last_tile_state"]["lost_timestamp"] / 1000
+            )
+        except TypeError:
+            _LOGGER.warning(
+                "Response missing last_tile_state; can't report location info"
+            )
+            self._last_timestamp = None
+            self._lost_timestamp = None
 
     def __str__(self) -> str:
         """Return the string representation of the Tile."""
         return f"<Tile uuid={self.uuid} name={self.name}>"
 
     @property
-    def accuracy(self) -> float:
+    def accuracy(self) -> Optional[float]:
         """Return the accuracy of the last measurement."""
-        return self._tile_data["last_tile_state"]["h_accuracy"]
+        try:
+            return self._tile_data["last_tile_state"]["h_accuracy"]
+        except TypeError:
+            return None
 
     @property
-    def altitude(self) -> float:
+    def altitude(self) -> Optional[float]:
         """Return the last detected altitude."""
-        return self._tile_data["last_tile_state"]["altitude"]
+        try:
+            return self._tile_data["last_tile_state"]["altitude"]
+        except TypeError:
+            return None
 
     @property
     def archetype(self) -> str:
@@ -62,27 +79,36 @@ class Tile:
         return self._tile_data["tile_type"]
 
     @property
-    def last_timestamp(self) -> datetime:
+    def last_timestamp(self) -> Optional[datetime]:
         """Return the timestamp of the last location measurement."""
         return self._last_timestamp
 
     @property
-    def latitude(self) -> float:
+    def latitude(self) -> Optional[float]:
         """Return the last detected latitude."""
-        return self._tile_data["last_tile_state"]["latitude"]
+        try:
+            return self._tile_data["last_tile_state"]["latitude"]
+        except TypeError:
+            return None
 
     @property
-    def longitude(self) -> float:
+    def longitude(self) -> Optional[float]:
         """Return the last detected longitude."""
-        return self._tile_data["last_tile_state"]["longitude"]
+        try:
+            return self._tile_data["last_tile_state"]["longitude"]
+        except TypeError:
+            return None
 
     @property
     def lost(self) -> bool:
         """Return whether the Tile is lost."""
-        return self._tile_data["last_tile_state"]["is_lost"]
+        try:
+            return self._tile_data["last_tile_state"]["is_lost"]
+        except TypeError:
+            return False
 
     @property
-    def lost_timestamp(self) -> datetime:
+    def lost_timestamp(self) -> Optional[datetime]:
         """Return the timestamp when the Tile was last in a "lost" state."""
         return self._lost_timestamp
 
@@ -103,12 +129,20 @@ class Tile:
 
     def _async_save_new_data(self, data: dict) -> None:
         """Save new Tile data in this object."""
-        self._last_timestamp = datetime.utcfromtimestamp(
-            data["result"]["last_tile_state"]["timestamp"] / 1000
-        )
-        self._lost_timestamp = datetime.utcfromtimestamp(
-            data["result"]["last_tile_state"]["lost_timestamp"] / 1000
-        )
+        try:
+            self._last_timestamp = datetime.utcfromtimestamp(
+                data["result"]["last_tile_state"]["timestamp"] / 1000
+            )
+            self._lost_timestamp = datetime.utcfromtimestamp(
+                data["result"]["last_tile_state"]["lost_timestamp"] / 1000
+            )
+        except TypeError:
+            _LOGGER.warning(
+                "Response missing last_tile_state; can't report location info"
+            )
+            self._last_timestamp = None
+            self._lost_timestamp = None
+
         self._tile_data = data["result"]
 
     async def async_update(self) -> None:
