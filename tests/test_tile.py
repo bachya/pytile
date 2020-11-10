@@ -75,17 +75,19 @@ async def test_get_tiles(aresponses, create_session_response):
         assert tile.altitude == 0.4076319168123
         assert tile.archetype == "WALLET"
         assert not tile.dead
+        assert not tile.lost
         assert tile.firmware_version == "01.12.14.0"
         assert tile.hardware_version == "02.09"
         assert tile.kind == "TILE"
         assert tile.last_timestamp == datetime(2020, 8, 12, 17, 55, 26)
         assert tile.latitude == 51.528308
         assert tile.longitude == -0.3817765
-        assert not tile.lost
         assert tile.lost_timestamp == datetime(1969, 12, 31, 23, 59, 59, 999000)
         assert tile.name == TILE_TILE_NAME
+        assert tile.ring_state == "STOPPED"
         assert tile.uuid == TILE_TILE_UUID
         assert tile.visible
+        assert tile.voip_state == "OFFLINE"
 
 
 @pytest.mark.asyncio
