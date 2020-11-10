@@ -118,6 +118,11 @@ class Tile:
         return self._tile_data["name"]
 
     @property
+    def ring_state(self) -> str:
+        """Return the ring state."""
+        return self._tile_data["last_tile_state"]["ring_state"]
+
+    @property
     def uuid(self) -> str:
         """Return the UUID."""
         return self._tile_data["tile_uuid"]
@@ -126,6 +131,11 @@ class Tile:
     def visible(self) -> bool:
         """Return whether the Tile is visible."""
         return self._tile_data["visible"]
+
+    @property
+    def voip_state(self) -> str:
+        """Return the VoIP state."""
+        return self._tile_data["last_tile_state"]["voip_state"]
 
     def _async_save_new_data(self, data: dict) -> None:
         """Save new Tile data in this object."""
