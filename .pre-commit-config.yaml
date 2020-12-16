@@ -65,4 +65,4 @@ repos:
       - id: shellcheck
         args:
           - --format=json
-        files: script/*
+        files: ^script/.+
