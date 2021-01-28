@@ -7,6 +7,12 @@ class TileError(Exception):
     pass
 
 
+class InvalidAuthError(TileError):
+    """Define an error related to invalid authentication."""
+
+    pass
+
+
 class RequestError(TileError):
     """Define an error related to invalid requests."""
 
