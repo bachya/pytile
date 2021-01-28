@@ -7,7 +7,7 @@ import aiohttp
 import pytest
 
 from pytile import async_login
-from pytile.errors import RequestError
+from pytile.errors import InvalidAuthError, RequestError
 
 from .common import (
     TILE_CLIENT_UUID,
@@ -56,9 +56,7 @@ async def test_bad_endpoint(aresponses, create_session_response):
 
 
 @pytest.mark.asyncio
-async def test_expired_session(
-    aresponses, create_session_response, expired_session_response
-):
+async def test_expired_session(aresponses, create_session_response):
     """Test that an expired session is recreated automatically."""
     aresponses.add(
         "production.tile-api.com",
@@ -128,8 +126,26 @@ async def test_expired_session(
 
         # Simulate an expired session:
         api._session_expiry = int(time() * 1000) - 1000000
+        await api.async_get_tiles()
 
-        tiles = await api.async_get_tiles()
+
+@pytest.mark.asyncio
+async def test_invalid_auth(aresponses):
+    """Test initializing a client with a Tile session."""
+    client_pattern = re.compile(r"/api/v1/clients/.+")
+
+    aresponses.add(
+        "production.tile-api.com",
+        client_pattern,
+        "put",
+        aresponses.Response(
+            text="", status=401, headers={"Content-Type": "application/json"},
+        ),
+    )
+
+    async with aiohttp.ClientSession() as session:
+        with pytest.raises(InvalidAuthError):
+            await async_login(TILE_EMAIL, TILE_PASSWORD, session)
 
 
 @pytest.mark.asyncio

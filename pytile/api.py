@@ -8,7 +8,7 @@ from uuid import uuid4
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientError
 
-from .errors import RequestError
+from .errors import InvalidAuthError, RequestError
 from .tile import Tile
 
 _LOGGER = logging.getLogger(__name__)
@@ -108,9 +108,11 @@ class API:  # pylint: disable=too-many-instance-attributes
                 resp.raise_for_status()
                 data = await resp.json()
             except ClientError as err:
+                if "401" in str(err):
+                    raise InvalidAuthError("Invalid credentials") from err
                 raise RequestError(
                     f"Error requesting data from {endpoint}: {err}"
-                ) from None
+                ) from err
 
         _LOGGER.debug("Data received from /%s: %s", endpoint, data)
 
