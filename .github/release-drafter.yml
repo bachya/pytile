@@ -13,6 +13,7 @@ categories:
     labels:
       - "ci/cd"
       - "dependencies"
+      - "maintenance"
       - "tooling"
 change-template: "- $TITLE (#$NUMBER)"
 name-template: "$NEXT_PATCH_VERSION"
