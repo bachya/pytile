@@ -38,7 +38,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-aiohttp = "^3.6.2"
+aiohttp = "^3.7.4"
 python = "^3.6.0"
 pylint = "^2.5.2"
 
