@@ -43,52 +43,8 @@ class API:  # pylint: disable=too-many-instance-attributes
         self.client_uuid: str = str(uuid4()) if not client_uuid else client_uuid
         self.user_uuid: Optional[str] = None
 
-    async def async_get_tiles(self) -> Dict[str, Tile]:
-        """Get all active Tiles from the user's account."""
-        states = await self.async_request("get", "tiles/tile_states")
-
-        details_tasks = {
-            tile_uuid: self.async_request("get", f"tiles/{tile_uuid}")
-            for tile_uuid in [tile["tile_id"] for tile in states["result"]]
-        }
-
-        results = await asyncio.gather(*details_tasks.values())
-
-        return {
-            tile_uuid: Tile(self.async_request, tile_data["result"])
-            for tile_uuid, tile_data, in zip(details_tasks, results)
-        }
-
-    async def async_init(self) -> None:
-        """Create a Tile session."""
-        # Invalidate the existing session expiry datetime (if it exists) so that the
-        # next few requests don't fail:
-        self._session_expiry = None
-
-        if not self._client_established:
-            await self.async_request(
-                "put",
-                f"clients/{self.client_uuid}",
-                data={
-                    "app_id": DEFAULT_APP_ID,
-                    "app_version": DEFAULT_APP_VERSION,
-                    "locale": self._locale,
-                },
-            )
-            self._client_established = True
-
-        resp = await self.async_request(
-            "post",
-            f"clients/{self.client_uuid}/sessions",
-            data={"email": self._email, "password": self._password},
-        )
-
-        if not self.user_uuid:
-            self.user_uuid = resp["result"]["user"]["user_uuid"]
-        self._session_expiry = resp["result"]["session_expiration_timestamp"]
-
-    async def async_request(self, method: str, endpoint: str, **kwargs) -> dict:
-        """Make a request against AirVisual."""
+    async def _async_request(self, method: str, endpoint: str, **kwargs) -> dict:
+        """Make a request against Tile."""
         if self._session_expiry and self._session_expiry <= int(time() * 1000):
             await self.async_init()
 
@@ -117,6 +73,50 @@ class API:  # pylint: disable=too-many-instance-attributes
         _LOGGER.debug("Data received from /%s: %s", endpoint, data)
 
         return data
+
+    async def async_get_tiles(self) -> Dict[str, Tile]:
+        """Get all active Tiles from the user's account."""
+        states = await self._async_request("get", "tiles/tile_states")
+
+        details_tasks = {
+            tile_uuid: self._async_request("get", f"tiles/{tile_uuid}")
+            for tile_uuid in [tile["tile_id"] for tile in states["result"]]
+        }
+
+        results = await asyncio.gather(*details_tasks.values())
+
+        return {
+            tile_uuid: Tile(self._async_request, tile_data)
+            for tile_uuid, tile_data, in zip(details_tasks, results)
+        }
+
+    async def async_init(self) -> None:
+        """Create a Tile session."""
+        # Invalidate the existing session expiry datetime (if it exists) so that the
+        # next few requests don't fail:
+        self._session_expiry = None
+
+        if not self._client_established:
+            await self._async_request(
+                "put",
+                f"clients/{self.client_uuid}",
+                data={
+                    "app_id": DEFAULT_APP_ID,
+                    "app_version": DEFAULT_APP_VERSION,
+                    "locale": self._locale,
+                },
+            )
+            self._client_established = True
+
+        resp = await self._async_request(
+            "post",
+            f"clients/{self.client_uuid}/sessions",
+            data={"email": self._email, "password": self._password},
+        )
+
+        if not self.user_uuid:
+            self.user_uuid = resp["result"]["user"]["user_uuid"]
+        self._session_expiry = resp["result"]["session_expiration_timestamp"]
 
 
 async def async_login(

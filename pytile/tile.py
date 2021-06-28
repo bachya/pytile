@@ -5,9 +5,6 @@ from typing import Awaitable, Callable, Optional
 
 _LOGGER = logging.getLogger(__name__)
 
-TASK_DETAILS = "details"
-TASK_MEASUREMENTS = "measurements"
-
 
 class Tile:
     """Define a Tile."""
@@ -19,19 +16,9 @@ class Tile:
         self._async_request = async_request
         self._tile_data = tile_data
 
-        try:
-            self._last_timestamp: Optional[datetime] = datetime.utcfromtimestamp(
-                tile_data["last_tile_state"]["timestamp"] / 1000
-            )
-            self._lost_timestamp: Optional[datetime] = datetime.utcfromtimestamp(
-                tile_data["last_tile_state"]["lost_timestamp"] / 1000
-            )
-        except TypeError:
-            _LOGGER.warning(
-                "Response missing last_tile_state; can't report location info"
-            )
-            self._last_timestamp = None
-            self._lost_timestamp = None
+        self._last_timestamp: Optional[datetime] = None
+        self._lost_timestamp: Optional[datetime] = None
+        self._save_timestamps(tile_data)
 
     def __str__(self) -> str:
         """Return the string representation of the Tile."""
@@ -40,43 +27,41 @@ class Tile:
     @property
     def accuracy(self) -> Optional[float]:
         """Return the accuracy of the last measurement."""
-        try:
-            return self._tile_data["last_tile_state"]["h_accuracy"]
-        except TypeError:
+        if not self._tile_data["result"].get("last_tile_state"):
             return None
+        return self._tile_data["result"]["last_tile_state"]["h_accuracy"]
 
     @property
     def altitude(self) -> Optional[float]:
         """Return the last detected altitude."""
-        try:
-            return self._tile_data["last_tile_state"]["altitude"]
-        except TypeError:
+        if not self._tile_data["result"].get("last_tile_state"):
             return None
+        return self._tile_data["result"]["last_tile_state"]["altitude"]
 
     @property
     def archetype(self) -> str:
         """Return the archetype."""
-        return self._tile_data["archetype"]
+        return self._tile_data["result"]["archetype"]
 
     @property
     def dead(self) -> bool:
         """Return whether the Tile is dead."""
-        return self._tile_data["is_dead"]
+        return self._tile_data["result"]["is_dead"]
 
     @property
     def firmware_version(self) -> str:
         """Return the firmware version."""
-        return self._tile_data["firmware_version"]
+        return self._tile_data["result"]["firmware_version"]
 
     @property
     def hardware_version(self) -> str:
         """Return the hardware version."""
-        return self._tile_data["hw_version"]
+        return self._tile_data["result"]["hw_version"]
 
     @property
     def kind(self) -> str:
         """Return the type of Tile."""
-        return self._tile_data["tile_type"]
+        return self._tile_data["result"]["tile_type"]
 
     @property
     def last_timestamp(self) -> Optional[datetime]:
@@ -86,26 +71,28 @@ class Tile:
     @property
     def latitude(self) -> Optional[float]:
         """Return the last detected latitude."""
-        try:
-            return self._tile_data["last_tile_state"]["latitude"]
-        except TypeError:
+        if not self._tile_data["result"].get("last_tile_state"):
             return None
+        return self._tile_data["result"]["last_tile_state"]["latitude"]
 
     @property
     def longitude(self) -> Optional[float]:
         """Return the last detected longitude."""
-        try:
-            return self._tile_data["last_tile_state"]["longitude"]
-        except TypeError:
+        if not self._tile_data["result"].get("last_tile_state"):
             return None
+        return self._tile_data["result"]["last_tile_state"]["longitude"]
 
     @property
     def lost(self) -> bool:
-        """Return whether the Tile is lost."""
-        try:
-            return self._tile_data["last_tile_state"]["is_lost"]
-        except TypeError:
-            return False
+        """
+        Return whether the Tile is lost.
+
+        Since the Tile API can sometimes fail to return last_tile_state data, if it's
+        missing here, we return True (indicating the Tile *is* lost).
+        """
+        if not self._tile_data["result"].get("last_tile_state"):
+            return True
+        return self._tile_data["result"]["last_tile_state"]["is_lost"]
 
     @property
     def lost_timestamp(self) -> Optional[datetime]:
@@ -115,47 +102,49 @@ class Tile:
     @property
     def name(self) -> str:
         """Return the name."""
-        return self._tile_data["name"]
+        return self._tile_data["result"]["name"]
 
     @property
-    def ring_state(self) -> str:
+    def ring_state(self) -> Optional[str]:
         """Return the ring state."""
-        return self._tile_data["last_tile_state"]["ring_state"]
+        if not self._tile_data["result"].get("last_tile_state"):
+            return None
+        return self._tile_data["result"]["last_tile_state"]["ring_state"]
 
     @property
     def uuid(self) -> str:
         """Return the UUID."""
-        return self._tile_data["tile_uuid"]
+        return self._tile_data["result"]["tile_uuid"]
 
     @property
     def visible(self) -> bool:
         """Return whether the Tile is visible."""
-        return self._tile_data["visible"]
+        return self._tile_data["result"]["visible"]
 
     @property
-    def voip_state(self) -> str:
+    def voip_state(self) -> Optional[str]:
         """Return the VoIP state."""
-        return self._tile_data["last_tile_state"]["voip_state"]
+        if not self._tile_data["result"].get("last_tile_state"):
+            return None
+        return self._tile_data["result"]["last_tile_state"]["voip_state"]
 
-    def _async_save_new_data(self, data: dict) -> None:
-        """Save new Tile data in this object."""
-        try:
-            self._last_timestamp = datetime.utcfromtimestamp(
-                data["result"]["last_tile_state"]["timestamp"] / 1000
-            )
-            self._lost_timestamp = datetime.utcfromtimestamp(
-                data["result"]["last_tile_state"]["lost_timestamp"] / 1000
-            )
-        except TypeError:
-            _LOGGER.warning(
-                "Response missing last_tile_state; can't report location info"
-            )
+    def _save_timestamps(self, tile_data: dict) -> None:
+        """Save UTC timestamps from a Tile data set."""
+        if not tile_data["result"].get("last_tile_state"):
+            _LOGGER.warning("Missing last_tile_state; can't report location info")
             self._last_timestamp = None
             self._lost_timestamp = None
+            return
 
-        self._tile_data = data["result"]
+        self._last_timestamp = datetime.utcfromtimestamp(
+            tile_data["result"]["last_tile_state"]["timestamp"] / 1000
+        )
+        self._lost_timestamp = datetime.utcfromtimestamp(
+            tile_data["result"]["last_tile_state"]["lost_timestamp"] / 1000
+        )
 
     async def async_update(self) -> None:
         """Get the latest measurements from the Tile."""
         data = await self._async_request("get", f"tiles/{self.uuid}")
-        self._async_save_new_data(data)
+        self._save_timestamps(data)
+        self._tile_data = data
