@@ -155,8 +155,10 @@ async def test_missing_last_tile_state(aresponses, create_session_response):
         assert not tile.last_timestamp
         assert not tile.latitude
         assert not tile.longitude
-        assert not tile.lost
+        assert tile.lost
         assert not tile.lost_timestamp
+        assert not tile.ring_state
+        assert not tile.voip_state
 
         await tile.async_update()
         assert not tile.latitude
