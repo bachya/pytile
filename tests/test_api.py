@@ -139,7 +139,9 @@ async def test_invalid_auth(aresponses):
         client_pattern,
         "put",
         aresponses.Response(
-            text="", status=401, headers={"Content-Type": "application/json"},
+            text="",
+            status=401,
+            headers={"Content-Type": "application/json"},
         ),
     )
 
