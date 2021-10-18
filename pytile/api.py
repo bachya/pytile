@@ -13,12 +13,14 @@ from .tile import Tile
 
 _LOGGER = logging.getLogger(__name__)
 
-API_URL_SCAFFOLD: str = "https://production.tile-api.com/api/v1"
+API_URL_SCAFFOLD = "https://production.tile-api.com/api/v1"
 
-DEFAULT_APP_ID: str = "ios-tile-production"
-DEFAULT_APP_VERSION: str = "2.69.0.4123"
-DEFAULT_LOCALE: str = "en-US"
-DEFAULT_TIMEOUT: int = 10
+DEFAULT_API_VERSION = "1.0"
+DEFAULT_APP_ID = "ios-tile-production"
+DEFAULT_APP_VERSION = "2.89.1.4774"
+DEFAULT_LOCALE = "en-US"
+DEFAULT_TIMEOUT = 10
+DEFAULT_USER_AGENT = "Tile/4774 CFNetwork/1312 Darwin/21.0.0"
 
 
 class API:  # pylint: disable=too-many-instance-attributes
@@ -49,17 +51,16 @@ class API:  # pylint: disable=too-many-instance-attributes
             await self.async_init()
 
         kwargs.setdefault("headers", {})
-        kwargs["headers"].update(
-            {
-                "Tile_app_id": DEFAULT_APP_ID,
-                "Tile_app_version": DEFAULT_APP_VERSION,
-                "Tile_client_uuid": self.client_uuid,
-            }
-        )
+        kwargs["headers"]["User-Agent"] = DEFAULT_USER_AGENT
+        kwargs["headers"]["tile_api_version"] = DEFAULT_API_VERSION
+        kwargs["headers"]["tile_app_id"] = DEFAULT_APP_ID
+        kwargs["headers"]["tile_app_version"] = DEFAULT_APP_VERSION
+        kwargs["headers"]["tile_client_uuid"] = self.client_uuid
 
         async with self._session.request(
             method, f"{API_URL_SCAFFOLD}/{endpoint}", **kwargs
         ) as resp:
+            print(resp.cookies)
             try:
                 resp.raise_for_status()
                 data = await resp.json()
