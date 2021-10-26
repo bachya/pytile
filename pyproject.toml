@@ -19,7 +19,7 @@ use_parentheses = true
 
 [tool.poetry]
 name = "pytile"
-version = "5.2.4"
+version = "2021.10.0"
 description = "A simple Python API for Tile® Bluetooth trackers"
 readme = "README.md"
 authors = ["Aaron Bach <bachya1208@gmail.com>"]
