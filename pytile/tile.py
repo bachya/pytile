@@ -1,7 +1,7 @@
 """Define a Tile object."""
 from datetime import datetime
 import logging
-from typing import Awaitable, Callable, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,6 +142,28 @@ class Tile:
         self._lost_timestamp = datetime.utcfromtimestamp(
             tile_data["result"]["last_tile_state"]["lost_timestamp"] / 1000
         )
+
+    def as_dict(self) -> Dict[str, Any]:
+        """Return dictionary version of this Tile."""
+        return {
+            "accuracy": self.accuracy,
+            "altitude": self.altitude,
+            "archetype": self.archetype,
+            "dead": self.dead,
+            "firmware_version": self.firmware_version,
+            "hardware_version": self.hardware_version,
+            "kind": self.kind,
+            "last_timestamp": self.last_timestamp,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "lost": self.lost,
+            "lost_timestamp": self.lost_timestamp,
+            "name": self.name,
+            "ring_state": self.ring_state,
+            "uuid": self.uuid,
+            "visible": self.visible,
+            "voip_state": self.voip_state,
+        }
 
     async def async_update(self) -> None:
         """Get the latest measurements from the Tile."""
