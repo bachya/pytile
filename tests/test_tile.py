@@ -166,6 +166,78 @@ async def test_missing_last_tile_state(aresponses, create_session_response):
 
 
 @pytest.mark.asyncio
+async def test_tile_as_dict(aresponses, create_session_response):
+    """Test dumping a Tile as a dictionary."""
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}",
+        "put",
+        aresponses.Response(
+            text=load_fixture("create_client_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/clients/{TILE_CLIENT_UUID}/sessions",
+        "post",
+        aresponses.Response(
+            text=json.dumps(create_session_response),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        "/api/v1/tiles/tile_states",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_states_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+    aresponses.add(
+        "production.tile-api.com",
+        f"/api/v1/tiles/{TILE_TILE_UUID}",
+        "get",
+        aresponses.Response(
+            text=load_fixture("tile_details_response.json"),
+            status=200,
+            headers={"Content-Type": "application/json"},
+        ),
+    )
+
+    async with aiohttp.ClientSession() as session:
+        api = await async_login(
+            TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+        )
+        tiles = await api.async_get_tiles()
+        assert len(tiles) == 1
+        tile = tiles[TILE_TILE_UUID]
+        assert tile.as_dict() == {
+            "accuracy": 13.496111,
+            "altitude": 0.4076319168123,
+            "archetype": "WALLET",
+            "dead": False,
+            "firmware_version": "01.12.14.0",
+            "hardware_version": "02.09",
+            "kind": "TILE",
+            "last_timestamp": datetime(2020, 8, 12, 17, 55, 26),
+            "latitude": 51.528308,
+            "longitude": -0.3817765,
+            "lost": False,
+            "lost_timestamp": datetime(1969, 12, 31, 23, 59, 59, 999000),
+            "name": "Wallet",
+            "ring_state": "STOPPED",
+            "uuid": "19264d2dffdbca32",
+            "visible": True,
+            "voip_state": "OFFLINE",
+        }
+
+
+@pytest.mark.asyncio
 async def test_tile_update(
     aresponses, create_session_response, tile_details_update_response
 ):
