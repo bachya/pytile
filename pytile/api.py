@@ -60,7 +60,6 @@ class API:  # pylint: disable=too-many-instance-attributes
         async with self._session.request(
             method, f"{API_URL_SCAFFOLD}/{endpoint}", **kwargs
         ) as resp:
-            print(resp.cookies)
             try:
                 resp.raise_for_status()
                 data = await resp.json()
