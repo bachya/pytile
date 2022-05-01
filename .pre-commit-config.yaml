@@ -10,7 +10,7 @@ repos:
           - --configfile=.bandit.yaml
         files: ^pytile/.+\.py$
   - repo: https://github.com/python/black
-    rev: 21.9b0
+    rev: 22.3.0
     hooks:
       - id: black
         args:
