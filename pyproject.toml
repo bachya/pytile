@@ -48,3 +48,33 @@ pre-commit = "^2.15.0"
 pytest = "^7.0.0"
 pytest-aiohttp = "^1.0.0"
 pytest-cov = "^3.0.0"
+
+[tool.pylint.BASIC]
+expected-line-ending-format = "LF"
+
+[tool.pylint."MESSAGES CONTROL"]
+# Reasons disabled:
+# bad-continuation - Invalid attack on black
+# unnecessary-pass - This can hurt readability
+disable = [
+  "bad-continuation",
+  "unnecessary-pass"
+]
+
+[tool.pylint.REPORTS]
+score = false
+
+[tool.pylint.SIMILARITIES]
+# Minimum lines number of a similarity.
+# We set this higher because of some cases where V2 and V3 functionality are
+# similar, but abstracting them isn't feasible.
+min-similarity-lines = 4
+
+# Ignore comments when computing similarities.
+ignore-comments = true
+
+# Ignore docstrings when computing similarities.
+ignore-docstrings = true
+
+# Ignore imports when computing similarities.
+ignore-imports = true
