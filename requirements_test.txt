@@ -1,5 +1,0 @@
-aiohttp>=3.8.0
-aresponses==1.1.2
-pytest-aiohttp==0.3.0
-pytest-cov==2.8.1
-pytest==6.2.5
