@@ -189,7 +189,7 @@ asyncio.run(main())
 5. Install the dev environment: `script/setup`
 6. Code your new feature or bug fix.
 7. Write tests that cover your new functionality.
-8. Run tests and ensure 100% code coverage: `script/test`
+8. Run tests and ensure 100% code coverage: `nox -rs coverage`
 9. Update `README.md` with any new documentation.
 10. Add yourself to `AUTHORS.md`.
 11. Submit a pull request!
