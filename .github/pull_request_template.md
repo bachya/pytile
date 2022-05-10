@@ -3,7 +3,7 @@
 **Does this fix a specific issue?**
 
 Fixes https://github.com/bachya/pytile/issues/<ISSUE ID>
-  
+
 **Checklist:**
 
 - [ ] Confirm that one or more new tests are written for the new functionality.
