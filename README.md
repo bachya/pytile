@@ -4,7 +4,7 @@
 [![PyPi](https://img.shields.io/pypi/v/pytile.svg)](https://pypi.python.org/pypi/pytile)
 [![Version](https://img.shields.io/pypi/pyversions/pytile.svg)](https://pypi.python.org/pypi/pytile)
 [![License](https://img.shields.io/pypi/l/pytile.svg)](https://github.com/bachya/pytile/blob/main/LICENSE)
-[![Code Coverage](https://codecov.io/gh/bachya/pytile/branch/main/graph/badge.svg)](https://codecov.io/gh/bachya/pytile)
+[![Code Coverage](https://codecov.io/gh/bachya/pytile/branch/dev/graph/badge.svg)](https://codecov.io/gh/bachya/pytile)
 [![Maintainability](https://api.codeclimate.com/v1/badges/71eb642c735e33adcdfc/maintainability)](https://codeclimate.com/github/bachya/pytile/maintainability)
 [![Say Thanks](https://img.shields.io/badge/SayThanks-!-1EAEDB.svg)](https://saythanks.io/to/bachya)
 
