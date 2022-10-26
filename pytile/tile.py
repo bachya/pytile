@@ -1,23 +1,27 @@
 """Define a Tile object."""
-from datetime import datetime
-import logging
-from typing import Any, Awaitable, Callable, Dict, Optional
+from __future__ import annotations
 
-_LOGGER = logging.getLogger(__name__)
+from collections.abc import Awaitable, Callable
+from datetime import datetime
+from typing import Any
+
+from .const import LOGGER
 
 
 class Tile:
     """Define a Tile."""
 
     def __init__(
-        self, async_request: Callable[..., Awaitable], tile_data: dict
+        self,
+        async_request: Callable[..., Awaitable[dict[str, Any]]],
+        tile_data: dict[str, Any],
     ) -> None:
         """Initialize."""
         self._async_request = async_request
         self._tile_data = tile_data
 
-        self._last_timestamp: Optional[datetime] = None
-        self._lost_timestamp: Optional[datetime] = None
+        self._last_timestamp: datetime | None = None
+        self._lost_timestamp: datetime | None = None
         self._save_timestamps(tile_data)
 
     def __str__(self) -> str:
@@ -25,18 +29,18 @@ class Tile:
         return f"<Tile uuid={self.uuid} name={self.name}>"
 
     @property
-    def accuracy(self) -> Optional[float]:
+    def accuracy(self) -> float | None:
         """Return the accuracy of the last measurement."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["h_accuracy"]
+        return last_state["h_accuracy"]
 
     @property
-    def altitude(self) -> Optional[float]:
+    def altitude(self) -> float | None:
         """Return the last detected altitude."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["altitude"]
+        return last_state["altitude"]
 
     @property
     def archetype(self) -> str:
@@ -64,23 +68,23 @@ class Tile:
         return self._tile_data["result"]["tile_type"]
 
     @property
-    def last_timestamp(self) -> Optional[datetime]:
+    def last_timestamp(self) -> datetime | None:
         """Return the timestamp of the last location measurement."""
         return self._last_timestamp
 
     @property
-    def latitude(self) -> Optional[float]:
+    def latitude(self) -> float | None:
         """Return the last detected latitude."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["latitude"]
+        return last_state["latitude"]
 
     @property
-    def longitude(self) -> Optional[float]:
+    def longitude(self) -> float | None:
         """Return the last detected longitude."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["longitude"]
+        return last_state["longitude"]
 
     @property
     def lost(self) -> bool:
@@ -90,12 +94,12 @@ class Tile:
         Since the Tile API can sometimes fail to return last_tile_state data, if it's
         missing here, we return True (indicating the Tile *is* lost).
         """
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return True
-        return self._tile_data["result"]["last_tile_state"]["is_lost"]
+        return last_state["is_lost"]
 
     @property
-    def lost_timestamp(self) -> Optional[datetime]:
+    def lost_timestamp(self) -> datetime | None:
         """Return the timestamp when the Tile was last in a "lost" state."""
         return self._lost_timestamp
 
@@ -105,11 +109,11 @@ class Tile:
         return self._tile_data["result"]["name"]
 
     @property
-    def ring_state(self) -> Optional[str]:
+    def ring_state(self) -> str | None:
         """Return the ring state."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["ring_state"]
+        return last_state["ring_state"]
 
     @property
     def uuid(self) -> str:
@@ -122,28 +126,26 @@ class Tile:
         return self._tile_data["result"]["visible"]
 
     @property
-    def voip_state(self) -> Optional[str]:
+    def voip_state(self) -> str | None:
         """Return the VoIP state."""
-        if not self._tile_data["result"].get("last_tile_state"):
+        if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return self._tile_data["result"]["last_tile_state"]["voip_state"]
+        return last_state["voip_state"]
 
-    def _save_timestamps(self, tile_data: dict) -> None:
+    def _save_timestamps(self, tile_data: dict[str, Any]) -> None:
         """Save UTC timestamps from a Tile data set."""
-        if not tile_data["result"].get("last_tile_state"):
-            _LOGGER.warning("Missing last_tile_state; can't report location info")
+        if (last_state := tile_data["result"].get("last_tile_state")) is None:
+            LOGGER.warning("Missing last_tile_state; can't report location info")
             self._last_timestamp = None
             self._lost_timestamp = None
             return
 
-        self._last_timestamp = datetime.utcfromtimestamp(
-            tile_data["result"]["last_tile_state"]["timestamp"] / 1000
-        )
+        self._last_timestamp = datetime.utcfromtimestamp(last_state["timestamp"] / 1000)
         self._lost_timestamp = datetime.utcfromtimestamp(
-            tile_data["result"]["last_tile_state"]["lost_timestamp"] / 1000
+            last_state["lost_timestamp"] / 1000
         )
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         """Return dictionary version of this Tile."""
         return {
             "accuracy": self.accuracy,
