@@ -60,10 +60,8 @@ expected-line-ending-format = "LF"
 
 [tool.pylint."MESSAGES CONTROL"]
 # Reasons disabled:
-# bad-continuation - Invalid attack on black
 # unnecessary-pass - This can hurt readability
 disable = [
-  "bad-continuation",
   "unnecessary-pass"
 ]
 
