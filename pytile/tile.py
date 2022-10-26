@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from .const import LOGGER
 
@@ -33,39 +33,39 @@ class Tile:
         """Return the accuracy of the last measurement."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["h_accuracy"]
+        return cast(float, last_state["h_accuracy"])
 
     @property
     def altitude(self) -> float | None:
         """Return the last detected altitude."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["altitude"]
+        return cast(float, last_state["altitude"])
 
     @property
     def archetype(self) -> str:
         """Return the archetype."""
-        return self._tile_data["result"]["archetype"]
+        return cast(str, self._tile_data["result"]["archetype"])
 
     @property
     def dead(self) -> bool:
         """Return whether the Tile is dead."""
-        return self._tile_data["result"]["is_dead"]
+        return cast(bool, self._tile_data["result"]["is_dead"])
 
     @property
     def firmware_version(self) -> str:
         """Return the firmware version."""
-        return self._tile_data["result"]["firmware_version"]
+        return cast(str, self._tile_data["result"]["firmware_version"])
 
     @property
     def hardware_version(self) -> str:
         """Return the hardware version."""
-        return self._tile_data["result"]["hw_version"]
+        return cast(str, self._tile_data["result"]["hw_version"])
 
     @property
     def kind(self) -> str:
         """Return the type of Tile."""
-        return self._tile_data["result"]["tile_type"]
+        return cast(str, self._tile_data["result"]["tile_type"])
 
     @property
     def last_timestamp(self) -> datetime | None:
@@ -77,14 +77,14 @@ class Tile:
         """Return the last detected latitude."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["latitude"]
+        return cast(float, last_state["latitude"])
 
     @property
     def longitude(self) -> float | None:
         """Return the last detected longitude."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["longitude"]
+        return cast(float, last_state["longitude"])
 
     @property
     def lost(self) -> bool:
@@ -96,7 +96,7 @@ class Tile:
         """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return True
-        return last_state["is_lost"]
+        return cast(bool, last_state["is_lost"])
 
     @property
     def lost_timestamp(self) -> datetime | None:
@@ -106,31 +106,31 @@ class Tile:
     @property
     def name(self) -> str:
         """Return the name."""
-        return self._tile_data["result"]["name"]
+        return cast(str, self._tile_data["result"]["name"])
 
     @property
     def ring_state(self) -> str | None:
         """Return the ring state."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["ring_state"]
+        return cast(str, last_state["ring_state"])
 
     @property
     def uuid(self) -> str:
         """Return the UUID."""
-        return self._tile_data["result"]["tile_uuid"]
+        return cast(str, self._tile_data["result"]["tile_uuid"])
 
     @property
     def visible(self) -> bool:
         """Return whether the Tile is visible."""
-        return self._tile_data["result"]["visible"]
+        return cast(bool, self._tile_data["result"]["visible"])
 
     @property
     def voip_state(self) -> str | None:
         """Return the VoIP state."""
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
-        return last_state["voip_state"]
+        return cast(str, last_state["voip_state"])
 
     def _save_timestamps(self, tile_data: dict[str, Any]) -> None:
         """Save UTC timestamps from a Tile data set."""

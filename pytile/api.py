@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from time import time
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 from aiohttp import ClientSession
@@ -46,7 +46,7 @@ class API:  # pylint: disable=too-many-instance-attributes
         self.user_uuid: str | None = None
 
     async def _async_request(
-        self, method: str, endpoint: str, **kwargs
+        self, method: str, endpoint: str, **kwargs: dict[str, Any]
     ) -> dict[str, Any]:
         """Make a request against Tile."""
         if self._session_expiry and self._session_expiry <= int(time() * 1000):
@@ -74,7 +74,7 @@ class API:  # pylint: disable=too-many-instance-attributes
 
         LOGGER.debug("Data received from /%s: %s", endpoint, data)
 
-        return data
+        return cast(dict[str, Any], data)
 
     async def async_get_tiles(self) -> dict[str, Tile]:
         """Get all active Tiles from the user's account."""
