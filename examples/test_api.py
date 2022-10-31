@@ -10,10 +10,10 @@ from pytile.errors import TileError
 _LOGGER = logging.getLogger(__name__)
 
 TILE_EMAIL = "<EMAIL>"
-TILE_PASSWORD = "<PASSWORD>"
+TILE_PASSWORD = "<PASSWORD>"  # noqa: S105
 
 
-async def main():
+async def main() -> None:
     """Run."""
     logging.basicConfig(level=logging.INFO)
     async with ClientSession() as session:

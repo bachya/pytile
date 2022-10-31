@@ -23,7 +23,7 @@ DEFAULT_TIMEOUT = 10
 DEFAULT_USER_AGENT = "Tile/4774 CFNetwork/1312 Darwin/21.0.0"
 
 
-class API:  # pylint: disable=too-many-instance-attributes
+class API:
     """Define the API management object."""
 
     def __init__(
@@ -35,20 +35,41 @@ class API:  # pylint: disable=too-many-instance-attributes
         client_uuid: str | None = None,
         locale: str = DEFAULT_LOCALE,
     ) -> None:
-        """Initialize."""
+        """Initialize.
+
+        Args:
+            email: An email address for a Tile account.
+            password: The account password.
+            session: An optional aiohttp ClientSession.
+            client_uuid: An optional UUID to identify this API object.
+            locale: An optional locale.
+        """
         self._client_established: bool = False
         self._email: str = email
         self._locale: str = locale
         self._password: str = password
         self._session: ClientSession = session
         self._session_expiry: int | None = None
-        self.client_uuid: str = str(uuid4()) if not client_uuid else client_uuid
+        self.client_uuid: str = client_uuid if client_uuid else str(uuid4())
         self.user_uuid: str | None = None
 
     async def _async_request(
         self, method: str, endpoint: str, **kwargs: dict[str, Any]
     ) -> dict[str, Any]:
-        """Make a request against Tile."""
+        """Make an API request.
+
+        Args:
+            method: An HTTP method.
+            endpoint: A relative API endpoint.
+            **kwargs: Additional kwargs to send with the request.
+
+        Returns:
+            An API response payload.
+
+        Raises:
+            InvalidAuthError: Raised upon invalid credentials.
+            RequestError: Raised upon an underlying HTTP error.
+        """
         if self._session_expiry and self._session_expiry <= int(time() * 1000):
             await self.async_init()
 
@@ -77,7 +98,11 @@ class API:  # pylint: disable=too-many-instance-attributes
         return cast(dict[str, Any], data)
 
     async def async_get_tiles(self) -> dict[str, Tile]:
-        """Get all active Tiles from the user's account."""
+        """Get all active Tiles from the user's account.
+
+        Returns:
+            A dictionary of Tile UUIDs to Tile objects.
+        """
         states = await self._async_request("get", "tiles/tile_states")
 
         details_tasks = {
@@ -129,7 +154,18 @@ async def async_login(
     client_uuid: str | None = None,
     locale: str = DEFAULT_LOCALE,
 ) -> API:
-    """Return an authenticated client."""
+    """Return an authenticated client.
+
+    Args:
+        email: An email address for a Tile account.
+        password: The account password.
+        session: An optional aiohttp ClientSession.
+        client_uuid: An optional UUID to identify this API object.
+        locale: An optional locale.
+
+    Returns:
+        An authenticated API object.
+    """
     api: API = API(email, password, session, client_uuid=client_uuid, locale=locale)
     await api.async_init()
     return api

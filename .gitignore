@@ -8,5 +8,4 @@
 __pycache__
 coverage.xml
 docs/_build
-poetry.lock
 tags

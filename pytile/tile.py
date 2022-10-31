@@ -16,7 +16,12 @@ class Tile:
         async_request: Callable[..., Awaitable[dict[str, Any]]],
         tile_data: dict[str, Any],
     ) -> None:
-        """Initialize."""
+        """Initialize.
+
+        Args:
+            async_request: The request method from the Client object.
+            tile_data: A dictionary of Tile data.
+        """
         self._async_request = async_request
         self._tile_data = tile_data
 
@@ -25,74 +30,120 @@ class Tile:
         self._save_timestamps(tile_data)
 
     def __str__(self) -> str:
-        """Return the string representation of the Tile."""
+        """Return the string representation of the Tile.
+
+        Returns:
+            A string representation.
+        """
         return f"<Tile uuid={self.uuid} name={self.name}>"
 
     @property
     def accuracy(self) -> float | None:
-        """Return the accuracy of the last measurement."""
+        """Return the accuracy of the last measurement.
+
+        Returns:
+            The accuracy (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(float, last_state["h_accuracy"])
 
     @property
     def altitude(self) -> float | None:
-        """Return the last detected altitude."""
+        """Return the last detected altitude.
+
+        Returns:
+            The altitude (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(float, last_state["altitude"])
 
     @property
     def archetype(self) -> str:
-        """Return the archetype."""
+        """Return the archetype.
+
+        Returns:
+            The archetype.
+        """
         return cast(str, self._tile_data["result"]["archetype"])
 
     @property
     def dead(self) -> bool:
-        """Return whether the Tile is dead."""
+        """Return whether the Tile is dead.
+
+        Returns:
+            The dead status.
+        """
         return cast(bool, self._tile_data["result"]["is_dead"])
 
     @property
     def firmware_version(self) -> str:
-        """Return the firmware version."""
+        """Return the firmware version.
+
+        Returns:
+            The firmware version.
+        """
         return cast(str, self._tile_data["result"]["firmware_version"])
 
     @property
     def hardware_version(self) -> str:
-        """Return the hardware version."""
+        """Return the hardware version.
+
+        Returns:
+            The hardware version.
+        """
         return cast(str, self._tile_data["result"]["hw_version"])
 
     @property
     def kind(self) -> str:
-        """Return the type of Tile."""
+        """Return the type of Tile.
+
+        Returns:
+            The type.
+        """
         return cast(str, self._tile_data["result"]["tile_type"])
 
     @property
     def last_timestamp(self) -> datetime | None:
-        """Return the timestamp of the last location measurement."""
+        """Return the timestamp of the last location measurement.
+
+        Returns:
+            The timestamp (if it exists).
+        """
         return self._last_timestamp
 
     @property
     def latitude(self) -> float | None:
-        """Return the last detected latitude."""
+        """Return the last detected latitude.
+
+        Returns:
+            The latitude (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(float, last_state["latitude"])
 
     @property
     def longitude(self) -> float | None:
-        """Return the last detected longitude."""
+        """Return the last detected longitude.
+
+        Returns:
+            The longitude (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(float, last_state["longitude"])
 
     @property
     def lost(self) -> bool:
-        """
-        Return whether the Tile is lost.
+        """Return whether the Tile is lost.
 
         Since the Tile API can sometimes fail to return last_tile_state data, if it's
         missing here, we return True (indicating the Tile *is* lost).
+
+        Returns:
+            The lost status.
         """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return True
@@ -100,40 +151,68 @@ class Tile:
 
     @property
     def lost_timestamp(self) -> datetime | None:
-        """Return the timestamp when the Tile was last in a "lost" state."""
+        """Return the timestamp when the Tile was last in a "lost" state.
+
+        Returns:
+            The timestamp (if it exists).
+        """
         return self._lost_timestamp
 
     @property
     def name(self) -> str:
-        """Return the name."""
+        """Return the name.
+
+        Returns:
+            The name.
+        """
         return cast(str, self._tile_data["result"]["name"])
 
     @property
     def ring_state(self) -> str | None:
-        """Return the ring state."""
+        """Return the ring state.
+
+        Returns:
+            The ring state (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(str, last_state["ring_state"])
 
     @property
     def uuid(self) -> str:
-        """Return the UUID."""
+        """Return the UUID.
+
+        Returns:
+            The UUID.
+        """
         return cast(str, self._tile_data["result"]["tile_uuid"])
 
     @property
     def visible(self) -> bool:
-        """Return whether the Tile is visible."""
+        """Return whether the Tile is visible.
+
+        Returns:
+            The visibility.
+        """
         return cast(bool, self._tile_data["result"]["visible"])
 
     @property
     def voip_state(self) -> str | None:
-        """Return the VoIP state."""
+        """Return the VoIP state.
+
+        Returns:
+            The VoIP state (if it exists).
+        """
         if (last_state := self._tile_data["result"].get("last_tile_state")) is None:
             return None
         return cast(str, last_state["voip_state"])
 
     def _save_timestamps(self, tile_data: dict[str, Any]) -> None:
-        """Save UTC timestamps from a Tile data set."""
+        """Save UTC timestamps from a Tile data set.
+
+        Args:
+            tile_data: A dictionary of Tile data.
+        """
         if (last_state := tile_data["result"].get("last_tile_state")) is None:
             LOGGER.warning("Missing last_tile_state; can't report location info")
             self._last_timestamp = None
@@ -146,7 +225,11 @@ class Tile:
         )
 
     def as_dict(self) -> dict[str, Any]:
-        """Return dictionary version of this Tile."""
+        """Return dictionary version of this Tile.
+
+        Returns:
+            A dictionary representation of the Tile.
+        """
         return {
             "accuracy": self.accuracy,
             "altitude": self.altitude,
