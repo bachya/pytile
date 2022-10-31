@@ -31,13 +31,13 @@ Please read the documentation carefully!
 
 `pytile` is currently supported on:
 
-* Python 3.9
-* Python 3.10
-* Python 3.11
+- Python 3.9
+- Python 3.10
+- Python 3.11
 
 # Installation
 
-```python
+```bash
 pip install pytile
 ```
 
@@ -116,21 +116,21 @@ objects as the values.
 
 The Tile object comes with several properties:
 
-* `accuracy`: the location accuracy of the Tile
-* `altitude`: the altitude of the Tile
-* `archetype`: the internal reference string that describes the Tile's "family"
-* `dead`: whether the Tile is inactive
-* `firmware_version`: the Tile's firmware version
-* `hardware_version`: the Tile's hardware version
-* `kind`: the kind of Tile (e.g., `TILE`, `PHONE`)
-* `last_timestamp`: the timestamp at which the current attributes were received
-* `latitude`: the latitude of the Tile
-* `longitude`: the latitude of the Tile
-* `lost`: whether the Tile has been marked as "lost"
-* `lost_timestamp`: the timestamp at which the Tile was last marked as "lost"
-* `name`: the name of the Tile
-* `uuid`: the Tile UUID
-* `visible`: whether the Tile is visible in the mobile app
+- `accuracy`: the location accuracy of the Tile
+- `altitude`: the altitude of the Tile
+- `archetype`: the internal reference string that describes the Tile's "family"
+- `dead`: whether the Tile is inactive
+- `firmware_version`: the Tile's firmware version
+- `hardware_version`: the Tile's hardware version
+- `kind`: the kind of Tile (e.g., `TILE`, `PHONE`)
+- `last_timestamp`: the timestamp at which the current attributes were received
+- `latitude`: the latitude of the Tile
+- `longitude`: the latitude of the Tile
+- `lost`: whether the Tile has been marked as "lost"
+- `lost_timestamp`: the timestamp at which the Tile was last marked as "lost"
+- `name`: the name of the Tile
+- `uuid`: the Tile UUID
+- `visible`: whether the Tile is visible in the mobile app
 
 ```python
 import asyncio
@@ -183,14 +183,14 @@ asyncio.run(main())
 # Contributing
 
 1. [Check for open features/bugs](https://github.com/bachya/pytile/issues)
-  or [initiate a discussion on one](https://github.com/bachya/pytile/issues/new).
+   or [initiate a discussion on one](https://github.com/bachya/pytile/issues/new).
 2. [Fork the repository](https://github.com/bachya/pytile/fork).
 3. (_optional, but highly recommended_) Create a virtual environment: `python3 -m venv .venv`
 4. (_optional, but highly recommended_) Enter the virtual environment: `source ./.venv/bin/activate`
 5. Install the dev environment: `script/setup`
 6. Code your new feature or bug fix.
 7. Write tests that cover your new functionality.
-8. Run tests and ensure 100% code coverage: `nox -rs coverage`
+8. Run tests and ensure 100% code coverage: `poetry run pytest --cov pytile tests`
 9. Update `README.md` with any new documentation.
 10. Add yourself to `AUTHORS.md`.
 11. Submit a pull request!
