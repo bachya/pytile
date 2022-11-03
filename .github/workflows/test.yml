@@ -29,11 +29,11 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
 
-      - name: 🏗 Set up Python 3.9
+      - name: 🏗 Set up Python
         id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python-version }}
 
       - name: ⤵️ Get pip cache directory
         id: pip-cache
@@ -83,11 +83,6 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version:
-          - "3.9"
 
     steps:
       - name: ⤵️ Check out code from GitHub
