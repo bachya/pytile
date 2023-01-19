@@ -114,7 +114,7 @@ class API:
 
         return {
             tile_uuid: Tile(self._async_request, tile_data)
-            for tile_uuid, tile_data, in zip(details_tasks, results)
+            for tile_uuid, tile_data, in zip(details_tasks, results)  # noqa: B905
         }
 
     async def async_init(self) -> None:
