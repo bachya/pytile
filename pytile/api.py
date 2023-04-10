@@ -110,12 +110,19 @@ class API:
             for tile_uuid in [tile["tile_id"] for tile in states["result"]]
         }
 
-        results = await asyncio.gather(*details_tasks.values())
+        results = await asyncio.gather(*details_tasks.values(), return_exceptions=True)
 
-        return {
-            tile_uuid: Tile(self._async_request, tile_data)
-            for tile_uuid, tile_data, in zip(details_tasks, results)  # noqa: B905
-        }
+        data = {}
+        for tile_uuid, result in zip(details_tasks, results):
+            if isinstance(result, RequestError):
+                if "412" in str(result):
+                    # Tile Labels will return an HTTP 412 because they don't have
+                    # additional details; we can safely ignore these errors and still
+                    # track the Tile (without additional details):
+                    continue
+            data[tile_uuid] = Tile(self._async_request, result)
+
+        return data
 
     async def async_init(self) -> None:
         """Create a Tile session."""
