@@ -178,6 +178,37 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+## Getting Tile History
+
+You can retrieve a Tile's history by calling its `async_history` coroutine:
+
+```python
+import asyncio
+from datetime import datetime
+
+from aiohttp import ClientSession
+
+from pytile import async_login
+
+
+async def main() -> None:
+    """Run!"""
+    async with ClientSession() as session:
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+
+        tiles = await api.async_get_tiles()
+
+        for tile_uuid, tile in tiles.items():
+            # Define a start and end datetime to get history for:
+            start = datetime(2023, 1, 1, 0, 0, 0)
+            end = datetime(2023, 1, 31, 0, 0, 0)
+            history = tile.async_history(start, end)
+            # >>> { "version": 1, "revision": 1, ... }
+
+
+asyncio.run(main())
+```
+
 # Contributing
 
 Thanks to all of [our contributors][contributors] so far!
