@@ -268,6 +268,48 @@ async def test_tile_as_dict(
 
 
 @pytest.mark.asyncio
+async def test_tile_label(
+    aresponses: ResponsesMockServer,
+    authenticated_tile_api_server: ResponsesMockServer,
+    tile_states_response: dict[str, Any],
+) -> None:
+    """Test a Tile label (which is ignored by this library).
+
+    This is a sanity check that a Tile Label, which returns an HTTP 412 when passed to
+    /api/v1/tiles/{TILE_UUID}, is handled correctly.
+
+    Args:
+        aresponses: An aresponses server.
+        authenticated_tile_api_server: A mock Tile API server connection.
+        tile_states_response: An API response payload.
+    """
+    async with authenticated_tile_api_server:
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            "/api/v1/tiles/tile_states",
+            "get",
+            response=aiohttp.web_response.json_response(
+                tile_states_response, status=200
+            ),
+        )
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            f"/api/v1/tiles/{TILE_TILE_UUID}",
+            "get",
+            response=aresponses.Response(text="", status=412),
+        )
+
+        async with aiohttp.ClientSession() as session:
+            api = await async_login(
+                TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+            )
+            tiles = await api.async_get_tiles()
+            assert len(tiles) == 0
+
+    aresponses.assert_plan_strictly_followed()
+
+
+@pytest.mark.asyncio
 async def test_tile_update(
     aresponses: ResponsesMockServer,
     authenticated_tile_api_server: ResponsesMockServer,
