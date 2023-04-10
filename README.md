@@ -178,9 +178,9 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-## Getting Tile History
+## Getting Premium Tile's History
 
-You can retrieve a Tile's history by calling its `async_history` coroutine:
+You can retrieve a premium Tile's history by calling its `async_history` coroutine:
 
 ```python
 import asyncio
