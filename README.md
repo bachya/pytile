@@ -202,7 +202,7 @@ async def main() -> None:
             # Define a start and end datetime to get history for:
             start = datetime(2023, 1, 1, 0, 0, 0)
             end = datetime(2023, 1, 31, 0, 0, 0)
-            history = tile.async_history(start, end)
+            history = await tile.async_history(start, end)
             # >>> { "version": 1, "revision": 1, ... }
 
 
