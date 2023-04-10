@@ -88,6 +88,8 @@ asyncio.run(main())
 
 ## Getting Tiles
 
+**Tile Premium Required: No**
+
 ```python
 import asyncio
 
@@ -180,7 +182,9 @@ asyncio.run(main())
 
 ## Getting Premium Tile's History
 
-You can retrieve a premium Tile's history by calling its `async_history` coroutine:
+**Tile Premium Required: Yes**
+
+You can retrieve a Tile's history by calling its `async_history` coroutine:
 
 ```python
 import asyncio
