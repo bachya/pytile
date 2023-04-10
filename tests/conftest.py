@@ -164,6 +164,12 @@ def tile_details_update_response_fixture() -> dict[str, Any]:
     return cast(dict[str, Any], data)
 
 
+@pytest.fixture(name="tile_history_response", scope="session")
+def tile_history_response_fixture() -> dict[str, Any]:
+    """Return a fixture for a Tile history response."""
+    return cast(dict[str, Any], json.loads(load_fixture("tile_history_response.json")))
+
+
 @pytest.fixture(name="tile_states_response", scope="session")
 def tile_states_response_fixture() -> dict[str, Any]:
     """Return a fixture for a Tile states response."""

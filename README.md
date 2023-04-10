@@ -88,6 +88,8 @@ asyncio.run(main())
 
 ## Getting Tiles
 
+**Tile Premium Required: No**
+
 ```python
 import asyncio
 
@@ -173,6 +175,39 @@ async def main() -> None:
 
         for tile_uuid, tile in tiles.items():
             await tile.async_update()
+
+
+asyncio.run(main())
+```
+
+## Getting Premium Tile's History
+
+**Tile Premium Required: Yes**
+
+You can retrieve a Tile's history by calling its `async_history` coroutine:
+
+```python
+import asyncio
+from datetime import datetime
+
+from aiohttp import ClientSession
+
+from pytile import async_login
+
+
+async def main() -> None:
+    """Run!"""
+    async with ClientSession() as session:
+        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+
+        tiles = await api.async_get_tiles()
+
+        for tile_uuid, tile in tiles.items():
+            # Define a start and end datetime to get history for:
+            start = datetime(2023, 1, 1, 0, 0, 0)
+            end = datetime(2023, 1, 31, 0, 0, 0)
+            history = await tile.async_history(start, end)
+            # >>> { "version": 1, "revision": 1, ... }
 
 
 asyncio.run(main())

@@ -250,6 +250,24 @@ class Tile:
             "voip_state": self.voip_state,
         }
 
+    async def async_history(
+        self, start_datetime: datetime, end_datetime: datetime
+    ) -> dict[str, Any]:
+        """Get the latest measurements from the Tile.
+
+        Returns:
+            A dictionary containing the requested history.
+        """
+        return await self._async_request(
+            "get",
+            f"tiles/location/history/{self.uuid}",
+            params={
+                "aggregation": "False",
+                "end_ts": round(end_datetime.timestamp() * 1000),
+                "start_ts": round(start_datetime.timestamp() * 1000),
+            },
+        )
+
     async def async_update(self) -> None:
         """Get the latest measurements from the Tile."""
         data = await self._async_request("get", f"tiles/{self.uuid}")
