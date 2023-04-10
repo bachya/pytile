@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "revision": 1,
+  "timestamp": "2023-04-10T17:49:50.098Z",
+  "timestamp_ms": 1681148990098,
+  "result_code": 0,
+  "result": {
+    "complete_history": "Y",
+    "location_updates": []
+  }
+}

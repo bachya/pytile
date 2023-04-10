@@ -19,6 +19,64 @@ from .common import (
 
 
 @pytest.mark.asyncio
+async def test_get_history(
+    aresponses: ResponsesMockServer,
+    authenticated_tile_api_server: ResponsesMockServer,
+    tile_details_response: dict[str, Any],
+    tile_history_response: dict[str, Any],
+    tile_states_response: dict[str, Any],
+) -> None:
+    """Test getting all Tiles associated with an account.
+
+    Args:
+        aresponses: An aresponses server.
+        authenticated_tile_api_server: A mock Tile API server connection.
+        tile_details_response: An API response payload.
+        tile_history_response: An API response payload.
+        tile_states_response: An API response payload.
+    """
+    async with authenticated_tile_api_server:
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            "/api/v1/tiles/tile_states",
+            "get",
+            response=aiohttp.web_response.json_response(
+                tile_states_response, status=200
+            ),
+        )
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            f"/api/v1/tiles/{TILE_TILE_UUID}",
+            "get",
+            response=aiohttp.web_response.json_response(
+                tile_details_response, status=200
+            ),
+        )
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            f"/api/v1/tiles/location/history/{TILE_TILE_UUID}",
+            "get",
+            response=aiohttp.web_response.json_response(
+                tile_history_response, status=200
+            ),
+        )
+
+        async with aiohttp.ClientSession() as session:
+            api = await async_login(
+                TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+            )
+            tiles = await api.async_get_tiles()
+            tile = tiles[TILE_TILE_UUID]
+
+            start_datetime = datetime(2023, 1, 1, 0, 0, 0)
+            end_datetime = datetime(2023, 1, 31, 0, 0, 0)
+            history = await tile.async_history(start_datetime, end_datetime)
+            assert history == tile_history_response
+
+    aresponses.assert_plan_strictly_followed()
+
+
+@pytest.mark.asyncio
 async def test_get_tiles(
     aresponses: ResponsesMockServer,
     authenticated_tile_api_server: ResponsesMockServer,
