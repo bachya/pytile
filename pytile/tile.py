@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, cast
 
 from .const import LOGGER
@@ -219,10 +219,12 @@ class Tile:
             self._lost_timestamp = None
             return
 
-        self._last_timestamp = datetime.utcfromtimestamp(last_state["timestamp"] / 1000)
-        self._lost_timestamp = datetime.utcfromtimestamp(
-            last_state["lost_timestamp"] / 1000
-        )
+        self._last_timestamp = datetime.fromtimestamp(
+            last_state["timestamp"] / 1000, tz=timezone.utc
+        ).replace(tzinfo=None)
+        self._lost_timestamp = datetime.fromtimestamp(
+            last_state["lost_timestamp"] / 1000, tz=timezone.utc
+        ).replace(tzinfo=None)
 
     def as_dict(self) -> dict[str, Any]:
         """Return dictionary version of this Tile.
