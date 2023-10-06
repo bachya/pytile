@@ -26,7 +26,7 @@ DEFAULT_USER_AGENT = "Tile/4774 CFNetwork/1312 Darwin/21.0.0"
 class API:
     """Define the API management object."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         email: str,
         password: str,
