@@ -29,9 +29,9 @@ Please read the documentation carefully!
 
 `pytile` is currently supported on:
 
-- Python 3.9
 - Python 3.10
 - Python 3.11
+- Python 3.12
 
 # Installation
 
