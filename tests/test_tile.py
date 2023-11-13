@@ -1,6 +1,8 @@
 """Define tests for the client object."""
+import logging
 from datetime import datetime
 from typing import Any
+from unittest.mock import Mock
 
 import aiohttp
 import pytest
@@ -136,6 +138,50 @@ async def test_get_tiles(
             assert tile.uuid == TILE_TILE_UUID
             assert tile.visible
             assert tile.voip_state == "OFFLINE"
+
+    aresponses.assert_plan_strictly_followed()
+
+
+@pytest.mark.asyncio
+async def test_get_tiles_http_error(
+    aresponses: ResponsesMockServer,
+    authenticated_tile_api_server: ResponsesMockServer,
+    caplog: Mock,
+    tile_states_response: dict[str, Any],
+) -> None:
+    """Test getting all Tiles associated with an account.
+
+    Args:
+        aresponses: An aresponses server.
+        authenticated_tile_api_server: A mock Tile API server connection.
+        caplog: A mocked logging utility.
+        tile_states_response: An API response payload.
+    """
+    caplog.set_level(logging.INFO)
+
+    async with authenticated_tile_api_server:
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            "/api/v1/tiles/tile_states",
+            "get",
+            response=aiohttp.web_response.json_response(
+                tile_states_response, status=200
+            ),
+        )
+        authenticated_tile_api_server.add(
+            "production.tile-api.com",
+            f"/api/v1/tiles/{TILE_TILE_UUID}",
+            "get",
+            response=aresponses.Response(text=None, status=500),
+        )
+
+        async with aiohttp.ClientSession() as session:
+            api = await async_login(
+                TILE_EMAIL, TILE_PASSWORD, session, client_uuid=TILE_CLIENT_UUID
+            )
+            tiles = await api.async_get_tiles()
+            assert len(tiles) == 0
+            assert any("Error requesting details" in e.message for e in caplog.records)
 
     aresponses.assert_plan_strictly_followed()
 

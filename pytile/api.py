@@ -114,12 +114,14 @@ class API:
 
         data = {}
         for tile_uuid, result in zip(details_tasks, results):
-            if isinstance(result, RequestError):
-                if "412" in str(result):
-                    # Tile Labels will return an HTTP 412 because they don't have
-                    # additional details; we can safely ignore these errors and still
-                    # track the Tile (without additional details):
-                    continue
+            if isinstance(result, RequestError) and "412" in str(result):
+                # Tile Labels will return an HTTP 412 because they don't have
+                # additional details; we can safely ignore these errors and still
+                # track the Tile (without additional details):
+                continue
+            if isinstance(result, BaseException):
+                LOGGER.error("Error requesting details for %s: %s", tile_uuid, result)
+                continue
             data[tile_uuid] = Tile(self._async_request, result)
 
         return data
