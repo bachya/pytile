@@ -61,7 +61,7 @@ classifiers = [
 [tool.poetry.dependencies]
 aiohttp = ">=3.9.0b0"
 certifi = ">=2023.07.22"
-python = ">=3.10,<=3.12"
+python = "^3.10"
 yarl = ">=1.9.2"
 
 [tool.poetry.group.dev.dependencies]
