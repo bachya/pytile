@@ -1,4 +1,5 @@
 """Define tests for the client object."""
+
 import re
 from time import time
 from typing import Any

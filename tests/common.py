@@ -1,4 +1,5 @@
 """Define common test utilities."""
+
 import os
 
 TILE_CLIENT_UUID = "2cc56adc-b96a-4293-9b94-eda716e0aa17"

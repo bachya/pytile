@@ -1,4 +1,5 @@
 """Define tests for the client object."""
+
 import logging
 from datetime import datetime
 from typing import Any
