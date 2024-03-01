@@ -1,4 +1,5 @@
 """Define fixtures, constants, etc. available for all tests."""
+
 import json
 import re
 from collections.abc import Generator
