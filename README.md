@@ -57,7 +57,7 @@ from pytile import async_login
 async def main() -> None:
     """Run!"""
     async with ClientSession() as session:
-        api = await async_login("<EMAIL>", "<PASSWORD>", session)
+        api = await async_login("aisha.dawoods@gmail.com", "Saf@123456", session)
 
 
 asyncio.run(main())

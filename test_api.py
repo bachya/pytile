@@ -10,8 +10,8 @@ from pytile.errors import TileError
 
 _LOGGER = logging.getLogger(__name__)
 
-TILE_EMAIL = "<EMAIL>"
-TILE_PASSWORD = "<PASSWORD>"  # noqa: S105
+TILE_EMAIL = "aisha.dawoods@gmail.com"
+TILE_PASSWORD = "Saf@123456"  # noqa: S105
 
 
 async def main() -> None:
