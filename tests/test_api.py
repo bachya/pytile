@@ -52,7 +52,7 @@ async def test_bad_endpoint(
 
 
 @pytest.mark.asyncio
-async def test_expired_session(  # pylint: disable=too-many-arguments
+async def test_expired_session(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     aresponses: ResponsesMockServer,
     authenticated_tile_api_server: ResponsesMockServer,
     create_client_response: dict[str, Any],

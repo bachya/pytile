@@ -17,7 +17,7 @@ from .common import TILE_CLIENT_UUID, TILE_EMAIL, TILE_USER_UUID, load_fixture
 def authenticated_tile_api_server_fixture(
     create_client_response: dict[str, Any],
     create_session_response: dict[str, Any],
-) -> Generator[ResponsesMockServer, None, None]:
+) -> Generator[ResponsesMockServer]:
     """Return a fixture that mocks an authenticated tile API server.
 
     Args:
