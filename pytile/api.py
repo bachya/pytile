@@ -90,9 +90,7 @@ class API:
         except ClientError as err:
             if "401" in str(err):
                 raise InvalidAuthError("Invalid credentials") from err
-            raise RequestError(
-                f"Error requesting data from {endpoint}: {err}"
-            ) from err
+            raise RequestError(f"Error requesting data from {endpoint}: {err}") from err
 
         LOGGER.debug("Data received from /%s: %s", endpoint, data)
 
