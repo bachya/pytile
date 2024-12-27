@@ -81,18 +81,18 @@ class API:
         kwargs["headers"]["tile_app_version"] = DEFAULT_APP_VERSION
         kwargs["headers"]["tile_client_uuid"] = self.client_uuid
 
-        async with self._session.request(
-            method, f"{API_URL_SCAFFOLD}/{endpoint}", **kwargs
-        ) as resp:
-            try:
+        try:
+            async with self._session.request(
+                method, f"{API_URL_SCAFFOLD}/{endpoint}", **kwargs
+            ) as resp:
                 resp.raise_for_status()
                 data = await resp.json()
-            except ClientError as err:
-                if "401" in str(err):
-                    raise InvalidAuthError("Invalid credentials") from err
-                raise RequestError(
-                    f"Error requesting data from {endpoint}: {err}"
-                ) from err
+        except ClientError as err:
+            if "401" in str(err):
+                raise InvalidAuthError("Invalid credentials") from err
+            raise RequestError(
+                f"Error requesting data from {endpoint}: {err}"
+            ) from err
 
         LOGGER.debug("Data received from /%s: %s", endpoint, data)
 
