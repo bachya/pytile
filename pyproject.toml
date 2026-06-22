@@ -73,7 +73,7 @@ codespell = "^2.2.2"
 coverage = {version = ">=6.5,<8.0", extras = ["toml"]}
 darglint = "^1.8.1"
 isort = "^5.10.1"
-mypy = "^1.2.0"
+mypy = ">=1.2,<3.0"
 pre-commit = ">=2.20,<5.0"
 pre-commit-hooks = ">=4.3,<6.0"
 pylint = ">=2.15.5,<4.0.0"
