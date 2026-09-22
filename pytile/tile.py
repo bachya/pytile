@@ -9,7 +9,7 @@ from typing import Any, cast
 from .const import LOGGER
 
 
-class Tile:
+class Tile:  # pylint: disable=too-many-public-methods
     """Define a Tile."""
 
     def __init__(
