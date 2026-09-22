@@ -70,6 +70,19 @@ class Tile:
         return cast(str, self._tile_data["result"]["archetype"])
 
     @property
+    def battery_status(self) -> str | None:
+        """Return the battery status.
+
+        Observed values are "NONE", "LEVEL1" and "LEVEL2"; whether a Tile reports a
+        level at all depends on its firmware generation. The key is absent for some
+        node types, so this returns None rather than raising.
+
+        Returns:
+            The battery status (if it exists).
+        """
+        return cast("str | None", self._tile_data["result"].get("battery_status"))
+
+    @property
     def dead(self) -> bool:
         """Return whether the Tile is dead.
 
@@ -237,6 +250,7 @@ class Tile:
             "accuracy": self.accuracy,
             "altitude": self.altitude,
             "archetype": self.archetype,
+            "battery_status": self.battery_status,
             "dead": self.dead,
             "firmware_version": self.firmware_version,
             "hardware_version": self.hardware_version,

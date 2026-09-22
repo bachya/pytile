@@ -125,6 +125,7 @@ async def test_get_tiles(
             assert tile.accuracy == 13.496111
             assert tile.altitude == 0.4076319168123
             assert tile.archetype == "WALLET"
+            assert tile.battery_status == "NONE"
             assert not tile.dead
             assert not tile.lost
             assert tile.firmware_version == "01.12.14.0"
@@ -295,6 +296,7 @@ async def test_tile_as_dict(
                 "accuracy": 13.496111,
                 "altitude": 0.4076319168123,
                 "archetype": "WALLET",
+                "battery_status": "NONE",
                 "dead": False,
                 "firmware_version": "01.12.14.0",
                 "hardware_version": "02.09",
