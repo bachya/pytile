@@ -76,7 +76,8 @@
     "auth_key": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "renewal_status": "NONE",
     "metadata": {
-      "battery_state": "10"
+      "battery_state": "10",
+      "battery_replaced_at": "1590969600000"
     },
     "battery_status": "NONE",
     "serial_number": null,

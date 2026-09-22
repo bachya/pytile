@@ -70,6 +70,22 @@ class Tile:  # pylint: disable=too-many-public-methods
         return cast(str, self._tile_data["result"]["archetype"])
 
     @property
+    def battery_replaced_timestamp(self) -> datetime | None:
+        """Return the timestamp at which the Tile's battery was last replaced.
+
+        Only Tiles with a user-replaceable battery that has been replaced carry this.
+
+        Returns:
+            The timestamp (if it exists).
+        """
+        metadata = self._tile_data["result"].get("metadata") or {}
+        if (replaced_at := metadata.get("battery_replaced_at")) is None:
+            return None
+        return datetime.fromtimestamp(int(replaced_at) / 1000, tz=timezone.utc).replace(
+            tzinfo=None
+        )
+
+    @property
     def battery_status(self) -> str | None:
         """Return the battery status.
 
@@ -250,6 +266,7 @@ class Tile:  # pylint: disable=too-many-public-methods
             "accuracy": self.accuracy,
             "altitude": self.altitude,
             "archetype": self.archetype,
+            "battery_replaced_timestamp": self.battery_replaced_timestamp,
             "battery_status": self.battery_status,
             "dead": self.dead,
             "firmware_version": self.firmware_version,
