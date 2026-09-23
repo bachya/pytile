@@ -119,6 +119,7 @@ The Tile object comes with several properties:
 - `accuracy`: the location accuracy of the Tile
 - `altitude`: the altitude of the Tile
 - `archetype`: the internal reference string that describes the Tile's "family"
+- `battery_replaced_timestamp`: the timestamp at which the Tile's battery was last replaced
 - `battery_status`: the Tile's battery status (e.g., `NONE`, `LEVEL1`, `LEVEL2`)
 - `dead`: whether the Tile is inactive
 - `firmware_version`: the Tile's firmware version

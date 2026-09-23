@@ -125,6 +125,7 @@ async def test_get_tiles(
             assert tile.accuracy == 13.496111
             assert tile.altitude == 0.4076319168123
             assert tile.archetype == "WALLET"
+            assert tile.battery_replaced_timestamp == datetime(2020, 6, 1, 0, 0)
             assert tile.battery_status == "NONE"
             assert not tile.dead
             assert not tile.lost
@@ -237,6 +238,7 @@ async def test_missing_last_tile_state(
             tile = tiles[TILE_TILE_UUID]
             assert not tile.accuracy
             assert not tile.altitude
+            assert not tile.battery_replaced_timestamp
             assert not tile.last_timestamp
             assert not tile.latitude
             assert not tile.longitude
@@ -296,6 +298,7 @@ async def test_tile_as_dict(
                 "accuracy": 13.496111,
                 "altitude": 0.4076319168123,
                 "archetype": "WALLET",
+                "battery_replaced_timestamp": datetime(2020, 6, 1, 0, 0),
                 "battery_status": "NONE",
                 "dead": False,
                 "firmware_version": "01.12.14.0",
