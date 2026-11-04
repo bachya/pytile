@@ -125,6 +125,7 @@ async def test_get_tiles(
             assert tile.accuracy == 13.496111
             assert tile.altitude == 0.4076319168123
             assert tile.archetype == "WALLET"
+            assert tile.auth_key == "xxxxxxxxxxxxxxxxxxxxxxxx"
             assert tile.battery_replaced_timestamp == datetime(2020, 6, 1, 0, 0)
             assert tile.battery_status == "NONE"
             assert not tile.dead
