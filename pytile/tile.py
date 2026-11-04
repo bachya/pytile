@@ -70,6 +70,15 @@ class Tile:  # pylint: disable=too-many-public-methods
         return cast(str, self._tile_data["result"]["archetype"])
 
     @property
+    def auth_key(self) -> str | None:
+        """Return the auth key.
+
+        Returns:
+            The auth key (if it exists).
+        """
+        return cast("str | None", self._tile_data["result"].get("auth_key"))
+
+    @property
     def battery_replaced_timestamp(self) -> datetime | None:
         """Return the timestamp at which the Tile's battery was last replaced.
 
